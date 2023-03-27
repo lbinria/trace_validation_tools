@@ -1,0 +1,14 @@
+{
+    "$id": "tla-definition",
+    "definitions": {
+        "set": {
+            "type": "array",
+            "format":"set",
+            "uniqueItems": true
+        },
+        "bag": {
+            "type": "array",
+            "format":"bag"
+        }
+    }
+}
