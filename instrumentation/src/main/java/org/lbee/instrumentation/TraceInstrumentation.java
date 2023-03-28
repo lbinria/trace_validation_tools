@@ -19,7 +19,6 @@ public class TraceInstrumentation {
     // Instrumented values
     private final HashMap<String, TrackedVariable> instrumentedValues;
     // Trace producer
-    //    private final TProducer traceProducer;
     private final TraceProducer traceProducer;
 
     public InstrumentationClock getClock() {
