@@ -1,5 +1,6 @@
 package org.lbee.instrumentation;
 
+import org.lbee.instrumentation.clock.ClockFactory;
 import org.lbee.instrumentation.clock.InstrumentationClock;
 import org.lbee.instrumentation.clock.LogicalClock;
 import org.lbee.instrumentation.clock.RealTimeClock;
@@ -10,17 +11,16 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class TraceInstrumentation<TProducer extends TraceProducer> {
+//public class TraceInstrumentation<TProducer extends TraceProducer> {
+public class TraceInstrumentation {
 
-
-    // Configuration
-    private final FormalInstrumentationConfig configuration;
     // Local clock
     private final InstrumentationClock clock;
     // Instrumented values
     private final HashMap<String, TrackedVariable> instrumentedValues;
     // Trace producer
-    private final TProducer traceProducer;
+    //    private final TProducer traceProducer;
+    private final TraceProducer traceProducer;
 
     public InstrumentationClock getClock() {
         return this.clock;
@@ -32,18 +32,16 @@ public class TraceInstrumentation<TProducer extends TraceProducer> {
         this.clock.sync(clock);
     }
 
-    public TraceInstrumentation(FormalInstrumentationConfig configuration, TProducer traceProducer) {
-        this.configuration = configuration;
+    //    public TraceInstrumentation(TProducer traceProducer, boolean logicalClock) {
+    public TraceInstrumentation(TraceProducer traceProducer, boolean logicalClock) {
         this.instrumentedValues = new HashMap<>();
-        this.clock = configuration.isLogicClock() ? new LogicalClock() : new RealTimeClock();
-
+        this.clock = ClockFactory.getClock(logicalClock);
         this.traceProducer = traceProducer;
     }
 
     public TrackedVariable add(String name) {
-        final TrackedVariable trackedVariable = new TrackedVariable(name);
+        final TrackedVariable trackedVariable = new TrackedVariable(name, this.traceProducer);
         this.instrumentedValues.put(name, trackedVariable);
-        trackedVariable.setTraceProducer(this.traceProducer);
         return trackedVariable;
     }
 

@@ -70,12 +70,9 @@ public class NDJsonTraceProducer implements TraceProducer {
     }
 
     @Override
-    public void produce(String operator, String variableName, Object[] args, long clock) throws TraceProducerException {
-        try {
-
+    public void produce(String operator, String variableName, Object[] args) throws TraceProducerException {
             // Create json object trace
             final JsonObject jsonTrace = new JsonObject();
-            jsonTrace.addProperty("clock", clock);
             jsonTrace.addProperty("sender", this.getGuid());
             jsonTrace.addProperty("var", variableName);
             jsonTrace.addProperty("op", operator);
@@ -83,15 +80,10 @@ public class NDJsonTraceProducer implements TraceProducer {
 
             this.traces.add(jsonTrace);
             System.out.printf("Traced event: %s.\n", jsonTrace.toString());
-
-        } catch (NoSuchFieldException | IllegalAccessException ex) {
-            // TODO set inner exception in order to keep trace
-            throw new TraceProducerException();
-        }
     }
 
     //
-    private JsonElement serializeValues(Object... values) throws NoSuchFieldException, IllegalAccessException {
+    private JsonElement serializeValues(Object... values) {
 
         final JsonArray jsonArgs = new JsonArray();
 
@@ -102,7 +94,7 @@ public class NDJsonTraceProducer implements TraceProducer {
         return jsonArgs;
     }
 
-    private JsonElement jsonValue(Object propertyValue) throws NoSuchFieldException, IllegalAccessException {
+    private JsonElement jsonValue(Object propertyValue) {
         final JsonElement jsonValue;
 
         if (propertyValue instanceof String)
