@@ -2,16 +2,9 @@ package org.lbee.instrumentation;
 
 import org.lbee.instrumentation.clock.ClockFactory;
 import org.lbee.instrumentation.clock.InstrumentationClock;
-import org.lbee.instrumentation.clock.LogicalClock;
-import org.lbee.instrumentation.clock.RealTimeClock;
-import org.lbee.instrumentation.config.FormalInstrumentationConfig;
 
 import java.util.HashMap;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.function.Supplier;
 
-//public class TraceInstrumentation<TProducer extends TraceProducer> {
 public class TraceInstrumentation {
 
     // Local clock
@@ -32,7 +25,6 @@ public class TraceInstrumentation {
         this.clock.sync(clock);
     }
 
-    //    public TraceInstrumentation(TProducer traceProducer, boolean logicalClock) {
     public TraceInstrumentation(TraceProducer traceProducer, boolean logicalClock) {
         this.instrumentedValues = new HashMap<>();
         this.clock = ClockFactory.getClock(logicalClock);
