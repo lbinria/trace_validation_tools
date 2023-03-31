@@ -2,16 +2,16 @@ package org.lbee.instrumentation.clock;
 
 public class ClockFactory {
 
-    public static InstrumentationClock getClock(boolean isLogical){
-        return isLogical ? new LogicalClockInternal() : new RealTimeClockInternal();
+    public static InstrumentationClock getClock(boolean isSystem){
+        return isSystem ? new SystemClockInternal() : new LocalClockInternal();
     }
 
-    static class LogicalClockInternal implements InstrumentationClock {
+    static class LocalClockInternal implements InstrumentationClock {
 
         // Current value of logical clock
         private long value;
 
-        public LogicalClockInternal() {
+        public LocalClockInternal() {
             this.value = 0;
         }
 
@@ -33,7 +33,13 @@ public class ClockFactory {
         }
     }
 
-    static class RealTimeClockInternal implements InstrumentationClock {
+    static class SystemClockInternal implements InstrumentationClock {
+
+        private final long start;
+
+        private SystemClockInternal() {
+            this.start = System.currentTimeMillis();
+        }
 
         @Override
         public void sync(long clock) {
