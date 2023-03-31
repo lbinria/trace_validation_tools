@@ -1,3 +1,4 @@
+import os
 import ndjson
 import argparse
 from functools import reduce
@@ -8,8 +9,9 @@ def read_trace(filename):
         return ndjson.load(f)
 
 def run(files):
+    all_paths = reduce(lambda a, b: a + b, ([f] if os.path.isfile(f) else [path for path in os.listdir(f) if path.endswith('.ndjson')] for f in files))
     # Open trace files and concatenate events
-    merged_trace = reduce(lambda a, b: a + b, (read_trace(path) for path in files), [])
+    merged_trace = reduce(lambda a, b: a + b, (read_trace(path) for path in all_paths), [])
     # Dump
     return ndjson.dumps(merged_trace)
 
