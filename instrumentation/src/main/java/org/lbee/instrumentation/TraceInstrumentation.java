@@ -5,7 +5,6 @@ import org.lbee.instrumentation.clock.InstrumentationClock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class TraceInstrumentation {
 

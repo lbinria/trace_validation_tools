@@ -152,6 +152,8 @@ public class NDJsonTraceProducer implements TraceProducer {
             jsonValue = jsonArrayOf((Object[]) propertyValue);
         else if (propertyValue instanceof List<?>)
             jsonValue = jsonArrayOf((List<?>)propertyValue);
+        else if (propertyValue instanceof HashSet<?>)
+            jsonValue = jsonArrayOf((HashSet<?>)propertyValue);
         else if (propertyValue instanceof Map<?,?>)
             jsonValue = jsonObjectOfMap((Map<String, ?>) propertyValue);
         else
@@ -161,6 +163,16 @@ public class NDJsonTraceProducer implements TraceProducer {
     }
 
     private JsonArray jsonArrayOf(List<?> list) {
+        final JsonArray jsonArray = new JsonArray();
+
+        for (Object e : list) {
+            jsonArray.add(serializeValue(e));
+        }
+
+        return jsonArray;
+    }
+
+    private JsonArray jsonArrayOf(HashSet<?> list) {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : list) {
