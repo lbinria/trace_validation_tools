@@ -35,7 +35,7 @@ public class ClockFactory {
 
     static class SystemClockInternal implements InstrumentationClock {
 
-        private final long start;
+        private long start;
 
         private SystemClockInternal() {
             this.start = System.currentTimeMillis();
@@ -43,12 +43,13 @@ public class ClockFactory {
 
         @Override
         public void sync(long clock) {
-            // Nothing to do
+            // Sync global clock
+            this.start -= (Math.max(this.getValue(), clock) + 1) - getValue();
         }
 
         @Override
         public long getValue() {
-            return System.currentTimeMillis();
+            return System.currentTimeMillis() - start;
         }
     }
 }
