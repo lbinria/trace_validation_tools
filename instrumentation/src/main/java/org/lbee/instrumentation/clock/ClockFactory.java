@@ -15,21 +15,24 @@ public class ClockFactory {
             this.value = 0;
         }
 
-        public void sync(long clock) {
+        // Return value
+        public synchronized long sync(long clock) {
             this.value = Math.max(this.getValue(), clock) + 1;
+            return this.value;
         }
 
         /**
          * Get elapsed time of clock between now and the moment it was created
          * @return Elapsed time in ms
          */
+        // TODO remove getValue
         public long getValue() {
             return this.value;
         }
 
         @Override
         public String toString() {
-            return Long.toString(this.getValue());
+            return Long.toString(this.value);
         }
     }
 
@@ -42,9 +45,10 @@ public class ClockFactory {
         }
 
         @Override
-        public void sync(long clock) {
+        public synchronized long sync(long clock) {
             // Sync global clock
             this.start -= (Math.max(this.getValue(), clock) + 1) - getValue();
+            return this.start;
         }
 
         @Override

@@ -2,7 +2,7 @@ package org.lbee.instrumentation.clock;
 
 public interface InstrumentationClock {
 
-    void sync(long clock);
+    long sync(long clock);
 
     /**
      * Get elapsed time of clock between now and the moment it was created

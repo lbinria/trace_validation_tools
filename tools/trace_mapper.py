@@ -145,7 +145,7 @@ def map_event(event):
         validate(instance=event['args'], schema=input_schema)
 
     # Map arguments
-    target_args = map_element(event['args'], json_op_map['map_args'])
+    target_args = map_element(event, json_op_map['map_args'])
 
     # If output schema is given validate target_args
     if shouldValidate and 'output_schema' in json_op_map:

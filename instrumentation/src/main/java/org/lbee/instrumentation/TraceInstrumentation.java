@@ -11,11 +11,11 @@ public class TraceInstrumentation {
     // Local clock
     private final InstrumentationClock clock;
     // Instrumented values
-    private final HashMap<String, TrackedVariable> instrumentedValues;
+    private final HashMap<String, TrackedVariable<?>> instrumentedValues;
     // Trace producer
     private final TraceProducer traceProducer;
 
-    private final ArrayList<TrackedVariable> orderedInstrumentedValues;
+    private final ArrayList<TrackedVariable<?>> orderedInstrumentedValues;
 
     public InstrumentationClock getClock() {
         return this.clock;
@@ -34,12 +34,12 @@ public class TraceInstrumentation {
         this.traceProducer = traceProducer;
     }
 
-    public TrackedVariable add(String name, Object value) {
+    public <TValue> TrackedVariable<TValue> add(String name, TValue value) {
         return add(name, value, new Object[] {});
     }
 
-    public TrackedVariable add(String name, Object value, Object... contextArgs) {
-        final TrackedVariable trackedVariable = new TrackedVariable(name, value, this.traceProducer, contextArgs);
+    public <TValue> TrackedVariable<TValue> add(String name, TValue value, Object... contextArgs) {
+        final TrackedVariable<TValue> trackedVariable = new TrackedVariable<>(name, value, this.traceProducer, contextArgs);
         this.instrumentedValues.put(name, trackedVariable);
         this.orderedInstrumentedValues.add(trackedVariable);
         return trackedVariable;
@@ -50,7 +50,7 @@ public class TraceInstrumentation {
      * @param name Tracked variable name
      * @return A tracked variable
      */
-    public TrackedVariable get(String name) {
+    public TrackedVariable<?> get(String name) {
         return this.instrumentedValues.get(name);
     }
 
@@ -77,11 +77,10 @@ public class TraceInstrumentation {
 
     public void commitChanges() throws TraceProducerException {
         // All events are committed at the same logical time (sync)
-        final long clock = this.clock.getValue();
+        // Sync clock
+        final long clock = this.clock.sync(this.clock.getValue());
         // Commit all previously changed variables
         this.traceProducer.commitChanges(clock);
-        // Resync clock
-        this.clock.sync(clock);
     }
 
 }
