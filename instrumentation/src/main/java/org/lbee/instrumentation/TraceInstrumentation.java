@@ -5,17 +5,16 @@ import org.lbee.instrumentation.clock.InstrumentationClock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class TraceInstrumentation {
 
     // Local clock
     private final InstrumentationClock clock;
-    // Instrumented values
-    private final HashMap<String, TrackedVariable<?>> instrumentedValues;
     // Trace producer
     private final TraceProducer traceProducer;
-
-    private final ArrayList<TrackedVariable<?>> orderedInstrumentedValues;
+    // Instrumented values
+    private final ArrayList<TrackedVariable<?>> variables;
 
     public InstrumentationClock getClock() {
         return this.clock;
@@ -28,8 +27,7 @@ public class TraceInstrumentation {
     }
 
     public TraceInstrumentation(TraceProducer traceProducer, boolean systemClock) {
-        this.instrumentedValues = new HashMap<>();
-        this.orderedInstrumentedValues = new ArrayList<>();
+        this.variables = new ArrayList<>();
         this.clock = ClockFactory.getClock(systemClock);
         this.traceProducer = traceProducer;
     }
@@ -40,42 +38,25 @@ public class TraceInstrumentation {
 
     public <TValue> TrackedVariable<TValue> add(String name, TValue value, Object... contextArgs) {
         final TrackedVariable<TValue> trackedVariable = new TrackedVariable<>(name, value, this.traceProducer, contextArgs);
-        this.instrumentedValues.put(name, trackedVariable);
-        this.orderedInstrumentedValues.add(trackedVariable);
+        this.variables.add(trackedVariable);
         return trackedVariable;
     }
 
-    /**
-     * Get a tracked variable by name
-     * @param name Tracked variable name
-     * @return A tracked variable
-     */
-    public TrackedVariable<?> get(String name) {
-        return this.instrumentedValues.get(name);
+    public void notifyChange(String variableName, String action, String[] path, Object... args) {
+        this.traceProducer.addUpdate(variableName, action, path, args);
     }
 
-    /**
-     * Sync log to an action
-     * @param action
-     */
-    public void syncCommit(Runnable action) {
-        action.run();
-        this.commit();
-    }
+//    /**
+//     * Get a tracked variable by name
+//     * @param name Tracked variable name
+//     * @return A tracked variable
+//     */
+//    public TrackedVariable<?> get(String name) {
+//        return this.variables.get(name);
+//    }
 
-    /**
-     * Commit logs
-     */
-    public void commit() {
-        // All events are committed at the same logical time (sync)
-        final long clock = this.clock.getValue();
-        // Commit all previously produced traces
-        this.traceProducer.commit(clock);
-        // Resync clock
-        this.clock.sync(clock);
-    }
-
-    public void commitChanges() throws TraceProducerException {
+    // Note: I found missing synchronized bug thanks to trace validation
+    public synchronized void commitChanges() throws TraceProducerException {
         // All events are committed at the same logical time (sync)
         // Sync clock
         final long clock = this.clock.sync(this.clock.getValue());

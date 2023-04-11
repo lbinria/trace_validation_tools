@@ -10,11 +10,11 @@ public class TrackedVariable<TValue> {
     private final Object[] contextArgs;
     private TValue value;
 
-    public TrackedVariable(String name, TValue value, TraceProducer traceProducer) {
+    TrackedVariable(String name, TValue value, TraceProducer traceProducer) {
         this(name, value, traceProducer, new Object[] {});
     }
 
-    public TrackedVariable(String name, TValue value, TraceProducer traceProducer, Object... contextArgs) {
+    TrackedVariable(String name, TValue value, TraceProducer traceProducer, Object... contextArgs) {
         this.name = name;
         this.value = value;
         this.traceProducer = traceProducer;

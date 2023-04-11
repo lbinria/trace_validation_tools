@@ -13,7 +13,7 @@ public class NDJsonTraceProducer implements TraceProducer {
 
     private final String guid;
     // TODO move to TraceInstrumentation
-    private final HashSet<TrackedVariable> changes;
+    private final HashSet<TrackedVariable<?>> changes;
     private final List<JsonObject> traces;
     private BufferedWriter writer;
 
@@ -83,12 +83,12 @@ public class NDJsonTraceProducer implements TraceProducer {
     {
         // Create json object trace
         final JsonObject jsonTrace = new JsonObject();
-        jsonTrace.addProperty("sender", this.getGuid());
+        jsonTrace.addProperty("clock", clock);
         jsonTrace.addProperty("var", variable.getName());
         jsonTrace.add("ctx", NDJsonSerializer.serializeValues(variable.getContextArgs()));
         jsonTrace.add("args", NDJsonSerializer.serializeValue(variable.getValue()));
         jsonTrace.add("op", new JsonPrimitive("set"));
-        jsonTrace.addProperty("clock", clock);
+        jsonTrace.addProperty("sender", this.getGuid());
 
         this.traces.add(jsonTrace);
         System.out.printf("Traced event: %s.\n", jsonTrace);
@@ -100,7 +100,7 @@ public class NDJsonTraceProducer implements TraceProducer {
     }
 
     @Override
-    public void produce(String operator, String variableName, Object[] args) throws TraceProducerException {
+    public void produce(String operator, String variableName, Object[] args) {
             // Create json object trace
             final JsonObject jsonTrace = new JsonObject();
             jsonTrace.addProperty("sender", this.getGuid());
@@ -110,6 +110,19 @@ public class NDJsonTraceProducer implements TraceProducer {
 
             this.traces.add(jsonTrace);
             System.out.printf("Traced event: %s.\n", jsonTrace);
+    }
+
+
+    @Override
+    public void addUpdate(String variableName, String action, String[] path, Object[] args) {
+        // Create json object trace
+        final JsonObject jsonTrace = new JsonObject();
+        jsonTrace.addProperty("sender", this.getGuid());
+        jsonTrace.addProperty("var", variableName);
+        jsonTrace.addProperty("op", action);
+        jsonTrace.add("path", NDJsonSerializer.jsonArrayOf(path));
+        jsonTrace.add("args", NDJsonSerializer.serializeValues(args));
+        this.traces.add(jsonTrace);
     }
 
 }
