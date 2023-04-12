@@ -7,10 +7,11 @@ It can be split into two parts:
  - An instrumentation, that aims to trace some events about some state changes of program variables. (instrumentation directory).
  - Some python scripts, that aims to work on trace files: merging, conversions or re-structuration. (tools directory).
 
-# Requirements
+# Prerequisite
 
- - Maven
- - Python
+- Java >= 17.0.6
+- Apache maven >= 3.6.3
+- Python >= 3.9.12
 
 # Install tools
 
