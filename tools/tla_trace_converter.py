@@ -22,8 +22,9 @@ def map_action(a):
 #     print(f"Action {a}")
     return { 'op': a['op'], 'path': a['path'], 'args': a['args'] }
 
-def run(input):
+def run(input, config):
     json_trace = read_trace(input)
+    json_config = read_trace(config)
 
     # Group by clock and sender
     # TODO sort clock / sender
@@ -34,7 +35,7 @@ def run(input):
     converted_trace = [{var: map_actions(actions) for var, actions in sort_and_group(mt, lambda x: x['var'])} for mt in merged_trace]
 
     # Add config at first line
-    json_trace_result = [{"__config": {}}] + converted_trace
+    json_trace_result = [{"__config": json_config}] + converted_trace
     # Dump
     return ndjson.dumps(json_trace_result)
 
@@ -42,6 +43,7 @@ if __name__ == "__main__":
     # Read program args
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('input', type=str, help="Trace file to convert.")
+    parser.add_argument('config', type=str, required=False, help="Configuration file of implementation.")
     args = parser.parse_args()
     # Print output
-    print(run(args.input))
+    print(run(args.input, args.config))
