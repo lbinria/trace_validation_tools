@@ -55,13 +55,17 @@ public class TraceInstrumentation {
 //        return this.variables.get(name);
 //    }
 
-    // Note: I found missing synchronized bug thanks to trace validation
     public synchronized void commitChanges() throws TraceProducerException {
+        commitChanges(null);
+    }
+
+    // Note: I found missing synchronized bug thanks to trace validation
+    public synchronized void commitChanges(String description) throws TraceProducerException {
         // All events are committed at the same logical time (sync)
         // Sync clock
         final long clock = this.clock.sync(this.clock.getValue());
         // Commit all previously changed variables
-        this.traceProducer.commitChanges(clock);
+        this.traceProducer.commitChanges(description, clock);
     }
 
 }

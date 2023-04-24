@@ -45,11 +45,12 @@ public class NDJsonTraceProducer implements TraceProducer {
     }
 
     @Override
-    public void commit(long clock) {
+    public void commit(String description, long clock) {
 
         for (JsonObject trace : this.traces) {
             // Set clock
             trace.addProperty("clock", clock);
+            trace.addProperty("desc", description);
             // Commit to file
             try {
                 writer.write(trace + "\n");
@@ -70,16 +71,16 @@ public class NDJsonTraceProducer implements TraceProducer {
     }
 
     @Override
-    public void commitChanges(long clock) {
+    public void commitChanges(String description, long clock) {
         // Trace changes
         for (TrackedVariable<?> changed : changes) {
-            trace(changed, clock);
+            trace(changed, description, clock);
         }
         this.changes.clear();
-        commit(clock);
+        commit(description, clock);
     }
 
-    public void trace(TrackedVariable<?> variable, long clock)
+    public void trace(TrackedVariable<?> variable, String description, long clock)
     {
         // Create json object trace
         final JsonObject jsonTrace = new JsonObject();
@@ -89,6 +90,9 @@ public class NDJsonTraceProducer implements TraceProducer {
         jsonTrace.add("args", NDJsonSerializer.serializeValue(variable.getValue()));
         jsonTrace.add("op", new JsonPrimitive("set"));
         jsonTrace.addProperty("sender", this.getGuid());
+
+        if (description != null)
+            jsonTrace.addProperty("desc", description);
 
         this.traces.add(jsonTrace);
         System.out.printf("Traced event: %s.\n", jsonTrace);

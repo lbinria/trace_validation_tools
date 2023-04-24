@@ -94,14 +94,18 @@ class NDJsonSerializer {
 
             try {
                 field.setAccessible(true);
+                final String fieldName = traceField.name() != null && !traceField.name().equals("") ? traceField.name() : field.getName();
                 final Object fieldValue = field.get(object);
-                jsonObject.add(traceField.name(), serializeValue(fieldValue));
+                jsonObject.add(fieldName, serializeValue(fieldValue));
 
             } catch (Exception e) {
                 // Nothing
                 e.printStackTrace();
             }
         }
+
+        // Add field containing class name of the object
+        jsonObject.addProperty("__type", object.getClass().getName());
 
         return jsonObject;
     }
