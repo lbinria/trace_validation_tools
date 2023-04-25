@@ -35,7 +35,7 @@ def run(input, config):
     converted_trace = [{var: map_actions(actions) for var, actions in sort_and_group(mt, lambda x: x['var'])} for mt in merged_trace]
 
     # Add config at first line
-    json_trace_result = [{"__config": json_config}] + converted_trace
+    json_trace_result = [{"__config": json_config[0]}] + converted_trace
     # Dump
     return ndjson.dumps(json_trace_result)
 

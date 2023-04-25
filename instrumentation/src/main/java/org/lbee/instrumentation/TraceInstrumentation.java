@@ -4,9 +4,8 @@ import org.lbee.instrumentation.clock.ClockFactory;
 import org.lbee.instrumentation.clock.InstrumentationClock;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
+// TODO rename to EventRecorder
 public class TraceInstrumentation {
 
     // Local clock
