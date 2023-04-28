@@ -8,10 +8,14 @@ def read_trace(filename):
     with open(filename) as f:
         return ndjson.load(f)
 
-def run(files):
-    all_paths = reduce(lambda a, b: a + b, ([f] if os.path.isfile(f) else [path for path in os.listdir(f) if path.endswith('.ndjson')] for f in files))
+def run(files, sort=False):
+    all_paths = reduce(lambda a, b: a + b, ([f] if os.path.isfile(f) else [os.path.join(f, filename) for filename in os.listdir(f) if filename.endswith('.ndjson')] for f in files))
     # Open trace files and concatenate events
     merged_trace = reduce(lambda a, b: a + b, (read_trace(path) for path in all_paths), [])
+
+    if sort:
+        merged_trace = list(sorted(merged_trace, key=lambda x: x['clock']))
+
     # Dump
     return ndjson.dumps(merged_trace)
 
@@ -19,6 +23,7 @@ if __name__ == "__main__":
     # Read program args
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('files', type=str, nargs="+", help="Trace files to merge")
+    parser.add_argument('--sort', type=bool, required=False, default=False, help="Sort by clock")
     args = parser.parse_args()
     # Print output
-    print(run(args.files))
+    print(run(args.files, args.sort))
