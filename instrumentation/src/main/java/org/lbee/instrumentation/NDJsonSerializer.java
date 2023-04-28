@@ -104,9 +104,6 @@ class NDJsonSerializer {
             }
         }
 
-        // Add field containing class name of the object
-        jsonObject.addProperty("__type", object.getClass().getName());
-
         return jsonObject;
     }
 
