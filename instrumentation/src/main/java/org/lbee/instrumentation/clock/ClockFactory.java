@@ -1,9 +1,15 @@
 package org.lbee.instrumentation.clock;
 
+import java.util.concurrent.TimeUnit;
+
 public class ClockFactory {
 
     public static InstrumentationClock getClock(boolean isSystem){
-        return isSystem ? new SystemClockInternal() : new LocalClockInternal();
+        return new LocalClockInternal();
+    }
+
+    public static InstrumentationClock getClock(){
+        return new LocalClockInternal();
     }
 
     static class LocalClockInternal implements InstrumentationClock {
@@ -47,8 +53,7 @@ public class ClockFactory {
         @Override
         public synchronized long sync(long clock) {
             // Sync global clock
-            this.start -= (Math.max(this.getValue(), clock) + 1) - getValue();
-            return this.start;
+            return getValue();
         }
 
         @Override

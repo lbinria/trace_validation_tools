@@ -2,6 +2,7 @@ package org.lbee.instrumentation;
 
 import org.lbee.instrumentation.clock.ClockFactory;
 import org.lbee.instrumentation.clock.InstrumentationClock;
+import org.lbee.instrumentation.clock.LogicalClock;
 
 import java.util.ArrayList;
 
@@ -31,6 +32,12 @@ public class TraceInstrumentation {
         this.traceProducer = traceProducer;
     }
 
+    public TraceInstrumentation(TraceProducer traceProducer, LogicalClock clock) {
+        this.variables = new ArrayList<>();
+        this.clock = clock;
+        this.traceProducer = traceProducer;
+    }
+
     public <TValue> TrackedVariable<TValue> add(String name, TValue value) {
         return add(name, value, new Object[] {});
     }
@@ -54,17 +61,20 @@ public class TraceInstrumentation {
 //        return this.variables.get(name);
 //    }
 
-    public synchronized void commitChanges() throws TraceProducerException {
-        commitChanges(null);
+    public synchronized boolean commitChanges() {
+        return commitChanges(null);
     }
 
     // Note: I found missing synchronized bug thanks to trace validation
-    public synchronized void commitChanges(String description) throws TraceProducerException {
+    public synchronized boolean commitChanges(String description) {
         // All events are committed at the same logical time (sync)
         // Sync clock
         final long clock = this.clock.sync(this.clock.getValue());
+
         // Commit all previously changed variables
+        // TODO catch error
         this.traceProducer.commitChanges(description, clock);
+        return true;
     }
 
 }
