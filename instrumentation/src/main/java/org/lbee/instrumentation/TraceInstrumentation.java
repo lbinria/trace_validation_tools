@@ -32,7 +32,7 @@ public class TraceInstrumentation {
         this.traceProducer = traceProducer;
     }
 
-    public TraceInstrumentation(TraceProducer traceProducer, LogicalClock clock) {
+    public TraceInstrumentation(TraceProducer traceProducer, InstrumentationClock clock) {
         this.variables = new ArrayList<>();
         this.clock = clock;
         this.traceProducer = traceProducer;
