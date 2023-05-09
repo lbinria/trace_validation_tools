@@ -71,7 +71,7 @@ public class TraceInstrumentation {
     }
     */
 
-    public void notifyChange(String variableName, String action, String[] path, Object[] args) {
+    public void notifyChange(String variableName, String action, String[] path, Object... args) {
         // Create json object trace
         final JsonObject jsonTrace = new JsonObject();
         jsonTrace.add("path", NDJsonSerializer.jsonArrayOf(path));
