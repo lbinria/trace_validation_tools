@@ -35,6 +35,16 @@ public class SharedClock implements InstrumentationClock {
     }
 
     /**
+     * Get a shared clock by its name
+     * @param name Name of shared clock you want
+     * @return A shared clock
+     * @throws IOException
+     */
+    public static SharedClock get(String name) throws IOException {
+        return new SharedClock(name);
+    }
+
+    /**
      * Get clock value
      * @return Clock value
      */

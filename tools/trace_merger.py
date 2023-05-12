@@ -31,4 +31,4 @@ if __name__ == "__main__":
     parser.add_argument('--config', type=str, required=False, default=None, help="Config file")
     args = parser.parse_args()
     # Print output
-    print(run(args.files, args.sort))
+    print(run(args.files, config=args.config, sort=args.sort))
