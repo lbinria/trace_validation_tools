@@ -31,7 +31,8 @@ public class SharedClock implements InstrumentationClock {
         final FileChannel channel = FileChannel.open(f.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
         final MappedByteBuffer b = channel.map(FileChannel.MapMode.READ_WRITE, 0, 8);
         buffer = b.asLongBuffer();
-        buffer.put(0, clock.getValue());
+        // HC: chercher la valeur initiale dans le fichier
+        buffer.put(0, 0);
     }
 
     /**
@@ -59,9 +60,9 @@ public class SharedClock implements InstrumentationClock {
      * @return Clock value
      */
     @Override
+    // HC: synchronize
     public long sync(long clock) {
-        this.clock.sync(clock);
-        long value = this.clock.getValue();
+        long value = this.clock.sync(clock);
         buffer.put(0, value);
         return value;
     }
