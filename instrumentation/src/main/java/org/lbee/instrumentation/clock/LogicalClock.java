@@ -9,7 +9,7 @@ public class LogicalClock implements InstrumentationClock {
         this.value = 0;
     }
 
-    // Return value
+
     public synchronized long sync(long clock) {
         this.value = Math.max(value, clock) + 1;
         return this.value;

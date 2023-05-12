@@ -17,8 +17,6 @@ public class TraceInstrumentation {
     private final String guid;
     // Local clock
     private final InstrumentationClock clock;
-    // Instrumented values
-    //private final ArrayList<TrackedVariable<?>> variables;
     // Writer to write event to file
     private BufferedWriter writer;
     // Updates that happens on a variable
@@ -43,7 +41,6 @@ public class TraceInstrumentation {
     }
 
     public TraceInstrumentation(String tracePath, InstrumentationClock clock) {
-//        this.variables = new ArrayList<>();
         this.clock = clock;
         // Set unique id
         this.guid = UUID.randomUUID().toString();
@@ -58,18 +55,6 @@ public class TraceInstrumentation {
             e.printStackTrace();
         }
     }
-
-//    public <TValue> TrackedVariable<TValue> add(String name, TValue value) {
-//        return add(name, value, new Object[] {});
-//    }
-
-    /*
-    public <TValue> TrackedVariable<TValue> add(String name, TValue value, Object... contextArgs) {
-        final TrackedVariable<TValue> trackedVariable = new TrackedVariable<>(name, value, this.traceProducer, contextArgs);
-        this.variables.add(trackedVariable);
-        return trackedVariable;
-    }
-    */
 
     public void notifyChange(String variableName, String action, String[] path, Object... args) {
         // Create json object trace
@@ -86,15 +71,6 @@ public class TraceInstrumentation {
         // Add action to variable
         variableActions.add(Map.entry(action, jsonTrace));
     }
-
-//    /**
-//     * Get a tracked variable by name
-//     * @param name Tracked variable name
-//     * @return A tracked variable
-//     */
-//    public TrackedVariable<?> get(String name) {
-//        return this.variables.get(name);
-//    }
 
     public synchronized boolean commitChanges() {
         return commitChanges(null);

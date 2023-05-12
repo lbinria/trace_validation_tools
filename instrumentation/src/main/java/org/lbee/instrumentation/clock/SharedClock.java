@@ -13,8 +13,6 @@ import java.nio.file.StandardOpenOption;
  */
 public class SharedClock implements InstrumentationClock {
 
-    // Internal clock
-    private final LogicalClock clock;
     // Buffer for writing clock value
     private final LongBuffer buffer;
 
@@ -24,15 +22,11 @@ public class SharedClock implements InstrumentationClock {
      * @throws IOException
      */
     public SharedClock(String name) throws IOException {
-        clock = new LogicalClock();
-
         // Create memory mapped file
         final File f = new File(name);
         final FileChannel channel = FileChannel.open(f.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
         final MappedByteBuffer b = channel.map(FileChannel.MapMode.READ_WRITE, 0, 8);
         buffer = b.asLongBuffer();
-        // HC: chercher la valeur initiale dans le fichier
-        buffer.put(0, 0);
     }
 
     /**
@@ -55,16 +49,35 @@ public class SharedClock implements InstrumentationClock {
     }
 
     /**
+     * Set clock value
+     * @param value Value
+     */
+    private void setValue(long value) {
+        buffer.put(0, value);
+    }
+
+    /**
+     * Reset shared clock (value=0)
+     */
+    public void reset() {
+        setValue(0);
+    }
+
+    /**
      * Synchronize clock with another value
      * @param clock Clock to synchronize with
      * @return Clock value
      */
     @Override
-    // HC: synchronize
-    public long sync(long clock) {
-        long value = this.clock.sync(clock);
-        buffer.put(0, value);
-        return value;
+    public synchronized long sync(long clock) {
+        final long value = getValue();
+        final long newValue = Math.max(value, clock) + 1;
+        setValue(newValue);
+        return newValue;
+    }
+
+    public String toString() {
+        return Long.toString(getValue());
     }
 
 }
