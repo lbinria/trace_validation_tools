@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-// TODO rename to EventRecorder
+// TODO rename to BehaviorRecorder
 public class TraceInstrumentation {
 
     // Unique id
@@ -70,6 +70,14 @@ public class TraceInstrumentation {
         variableActions = updates.get(variableName);
         // Add action to variable
         variableActions.add(Map.entry(action, jsonTrace));
+    }
+
+    public VirtualField getVariable(String name) {
+        return new VirtualField(name, this);
+    }
+
+    public void notifyChange(VirtualUpdate update) {
+        notifyChange(update.getVariableName(), update.getOp(), update.getPath(), update.getArgs());
     }
 
     public synchronized boolean commitChanges() {
