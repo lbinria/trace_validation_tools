@@ -1,6 +1,8 @@
 package org.lbee.instrumentation;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public final class VirtualField {
 
@@ -27,6 +29,8 @@ public final class VirtualField {
     public void set(Object val) {
         apply("Replace", val);
     }
+
+    public void addAll(Collection<?> vals) { apply("AddElements", vals); }
 
     public void add(Object val) {
         apply("AddElement", val);
