@@ -1,6 +1,7 @@
 package org.lbee.instrumentation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -57,16 +58,17 @@ public final class VirtualField {
     }
 
     public void apply(String op, Object... args) {
-        traceInstrumentation.notifyChange(new VirtualUpdate(this, op, args));
+        traceInstrumentation.notifyChange(new VirtualUpdate(this, op, Arrays.asList(args)));
     }
 
-    public ArrayList<String> getPath() {
-        final ArrayList<String> path;
+    public List<String> getPath() {
+        final List<String> path;
 
-        if (parentField == null)
+        if (parentField == null) {
              path = new ArrayList<>();
-        else
+        } else {
             path = parentField.getPath();
+        }
 
         path.add(name);
         return path;
