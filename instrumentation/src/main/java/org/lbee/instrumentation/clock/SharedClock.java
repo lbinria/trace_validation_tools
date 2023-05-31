@@ -43,7 +43,7 @@ public class SharedClock implements InstrumentationClock {
      * Get clock value
      * @return Clock value
      */
-    @Override
+    // @Override
     public long getValue() {
         return buffer.get(0);
     }

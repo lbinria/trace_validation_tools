@@ -16,7 +16,9 @@ public class TraceInstrumentation {
     // Unique id
     private final String guid;
     // Local clock
-    private final InstrumentationClock clock;
+    private long clock;
+    // Global clock
+    private final InstrumentationClock globalClock;
     // Writer to write event to file
     private BufferedWriter writer;
     // Updates that happens on a variable
@@ -31,9 +33,9 @@ public class TraceInstrumentation {
     public String getGuid() { return guid; }
 
     // Sync internal instrumentation clock with another clock
-    public void sync(long clock) {
-        this.clock.sync(clock);
-    }
+    // public void sync(long clock) {
+    //     this.clock.sync(clock);
+    // }
 
     private String generateTracePath() {
         final String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(Calendar.getInstance().getTime());
@@ -41,7 +43,8 @@ public class TraceInstrumentation {
     }
 
     public TraceInstrumentation(String tracePath, InstrumentationClock clock) {
-        this.clock = clock;
+        this.clock = 0L;
+        this.globalClock = clock;
         // Set unique id
         this.guid = UUID.randomUUID().toString();
         // empty map of variable updates
@@ -84,11 +87,11 @@ public class TraceInstrumentation {
     public synchronized boolean commitChanges(String description) {
         // All events are committed at the same logical time (sync)
         // Sync clock
-        final long clock = this.clock.sync(this.clock.getValue());
+        this.clock = this.globalClock.sync(this.clock);
 
         // Commit all previously changed variables
         // TODO catch error
-        commitChanges(description, clock);
+        commitChanges(description, this.clock);
         return true;
     }
 
