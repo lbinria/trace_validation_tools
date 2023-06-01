@@ -60,15 +60,13 @@ public class TraceInstrumentation {
         }
     }
 
-    public void notifyChange(String variableName, String action, List<String> path, Object... args) {
-        // Create json object trace
-        List<Object> argsList = Arrays.asList(args);
+    public void notifyChange(String variableName, String action, List<String> path, List<Object> args) {
 
         if (!updates.containsKey(variableName))
             updates.put(variableName, new ArrayList<>());
 
         // Add action to variable
-        updates.get(variableName).add(new TraceItem(action, path, argsList));
+        updates.get(variableName).add(new TraceItem(action, path, args));
     }
 
     public VirtualField getVariable(String name) {

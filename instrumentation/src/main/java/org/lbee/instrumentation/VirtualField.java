@@ -58,7 +58,7 @@ public final class VirtualField {
     }
 
     public void apply(String op, Object... args) {
-        traceInstrumentation.notifyChange(new VirtualUpdate(this, op, Arrays.asList(args)));
+        traceInstrumentation.notifyChange(new VirtualUpdate(this, op, List.of(args)));
     }
 
     public List<String> getPath() {

@@ -19,7 +19,7 @@ public class TraceItem {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("op", this.action);
         jsonObject.add("path", NDJsonSerializer.jsonArrayOf(path));
-        jsonObject.add("args", NDJsonSerializer.serializeValues(args));
+        jsonObject.add("args", NDJsonSerializer.jsonArrayOf(args));
         return jsonObject;
     }
     
