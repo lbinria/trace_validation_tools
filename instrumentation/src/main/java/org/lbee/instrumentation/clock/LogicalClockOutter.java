@@ -1,11 +1,11 @@
 package org.lbee.instrumentation.clock;
 
-public class LogicalClock implements InstrumentationClock {
+public class LogicalClockOutter implements InstrumentationClock {
 
     // Current value of logical clock
     private long value;
 
-    public LogicalClock() {
+    public LogicalClockOutter() {
         this.value = 0;
     }
 

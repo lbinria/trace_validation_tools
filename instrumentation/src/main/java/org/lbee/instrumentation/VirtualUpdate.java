@@ -1,37 +1,35 @@
 package org.lbee.instrumentation;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class VirtualUpdate {
 
     private final VirtualField field;
     private final String op;
-    private final Object[] args;
+    private final List<Object> args;
 
-    public VirtualUpdate(VirtualField field, String op, Object[] args) {
+    public VirtualUpdate(VirtualField field, String op, List<Object> args) {
         this.field = field;
         this.op = op;
-        this.args = args;
+        this.args = Collections.unmodifiableList(args);
     }
 
-    private String[] getCompletePath() {
-        // TODO memorize
-        return field.getPath().toArray(String[]::new);
-    }
-
-    public String[] getPath() {
-        return Arrays.stream(getCompletePath()).skip(1).toArray(String[]::new);
+    public List<String> getPrefixPath() {
+        return field.getPath().stream().skip(1).collect(Collectors.toList());
     }
 
     public String getVariableName() {
-        return getCompletePath()[0];
+        return field.getPath().get(0);
     }
 
     public String getOp() {
         return op;
     }
 
-    public Object[] getArgs() {
+    public List<Object> getArgs() {
         return args;
     }
 
@@ -40,7 +38,7 @@ public final class VirtualUpdate {
         return "VirtualUpdate{" +
                 "field=" + field +
                 ", op='" + op + '\'' +
-                ", args=" + Arrays.toString(args) +
+                ", args=" + args +
                 '}';
     }
 }

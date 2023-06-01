@@ -16,24 +16,26 @@ public class TraceInstrumentation {
     // Unique id
     private final String guid;
     // Local clock
-    private final InstrumentationClock clock;
+    private long clock;
+    // Global clock
+    private final InstrumentationClock globalClock;
     // Writer to write event to file
     private BufferedWriter writer;
     // Updates that happens on a variable
-    private final HashMap<String, List<Map.Entry<String, JsonObject>>> updates;
+    private final HashMap<String, List<TraceItem>> updates;
 
-    // Get instrumentation clock
-    public InstrumentationClock getClock() {
-        return this.clock;
-    }
+    // // Get instrumentation clock
+    // public InstrumentationClock getClock() {
+    //     return this.clock;
+    // }
 
     // Get instrumentation guid
     public String getGuid() { return guid; }
 
     // Sync internal instrumentation clock with another clock
-    public void sync(long clock) {
-        this.clock.sync(clock);
-    }
+    // public void sync(long clock) {
+    //     this.clock.sync(clock);
+    // }
 
     private String generateTracePath() {
         final String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(Calendar.getInstance().getTime());
@@ -41,14 +43,16 @@ public class TraceInstrumentation {
     }
 
     public TraceInstrumentation(String tracePath, InstrumentationClock clock) {
-        this.clock = clock;
+        this.clock = 0L;
+        this.globalClock = clock;
         // Set unique id
         this.guid = UUID.randomUUID().toString();
+        // empty map of variable updates
+        this.updates = new HashMap<>();
         // Get formatted timestamp
         final String path = tracePath != null ? tracePath : generateTracePath();
-
-        this.updates = new HashMap<>();
-
+        // Create the file
+        // TODO: change to constructor method to return NULL if IO exception
         try {
             this.writer = new BufferedWriter(new FileWriter(path));
         } catch (IOException e) {
@@ -56,20 +60,15 @@ public class TraceInstrumentation {
         }
     }
 
-    public void notifyChange(String variableName, String action, String[] path, Object... args) {
+    public void notifyChange(String variableName, String action, List<String> path, Object... args) {
         // Create json object trace
-        final JsonObject jsonTrace = new JsonObject();
-        jsonTrace.add("path", NDJsonSerializer.jsonArrayOf(path));
-        jsonTrace.add("args", NDJsonSerializer.serializeValues(args));
+        List<Object> argsList = Arrays.asList(args);
 
-        final List<Map.Entry<String, JsonObject>> variableActions;
         if (!updates.containsKey(variableName))
             updates.put(variableName, new ArrayList<>());
 
-        //
-        variableActions = updates.get(variableName);
         // Add action to variable
-        variableActions.add(Map.entry(action, jsonTrace));
+        updates.get(variableName).add(new TraceItem(action, path, argsList));
     }
 
     public VirtualField getVariable(String name) {
@@ -77,7 +76,7 @@ public class TraceInstrumentation {
     }
 
     public void notifyChange(VirtualUpdate update) {
-        notifyChange(update.getVariableName(), update.getOp(), update.getPath(), update.getArgs());
+        notifyChange(update.getVariableName(), update.getOp(), update.getPrefixPath(), update.getArgs());
     }
 
     public synchronized boolean commitChanges() {
@@ -88,11 +87,11 @@ public class TraceInstrumentation {
     public synchronized boolean commitChanges(String description) {
         // All events are committed at the same logical time (sync)
         // Sync clock
-        final long clock = this.clock.sync(this.clock.getValue());
+        this.clock = this.globalClock.sync(this.clock);
 
         // Commit all previously changed variables
         // TODO catch error
-        commitChanges(description, clock);
+        commitChanges(description, this.clock);
         return true;
     }
 
@@ -101,25 +100,16 @@ public class TraceInstrumentation {
         final JsonObject jsonEvent = new JsonObject();
         // Set clock
         jsonEvent.addProperty("clock", clock);
-
-        for (Map.Entry<String, List<Map.Entry<String, JsonObject>>> update : this.updates.entrySet()) {
-            // Get updated variable and actions made on it
-            final String variableName = update.getKey();
-            final List<Map.Entry<String, JsonObject>> actions = update.getValue();
-
+        // add actions
+        for (String variableName : this.updates.keySet()) {
+            // Get actions made on the updated variable
+            final List<TraceItem> actions = updates.get(variableName);
             final JsonArray jsonActions = new JsonArray();
-
-            for (Map.Entry<String, JsonObject> action : actions) {
-                final JsonObject jsonAction = new JsonObject();
-                jsonAction.addProperty("op", action.getKey());
-                jsonAction.add("path", action.getValue().getAsJsonArray("path"));
-                jsonAction.add("args", action.getValue().getAsJsonArray("args"));
-                jsonActions.add(jsonAction);
+            for (TraceItem action : actions) {
+                jsonActions.add(action.jsonize());
             }
-
             jsonEvent.add(variableName, jsonActions);
         }
-
         // Set description, sender
         jsonEvent.addProperty("desc", description);
         jsonEvent.addProperty("sender", this.getGuid());
