@@ -46,6 +46,8 @@ class NDJsonSerializer {
             jsonValue = jsonArrayOf((HashSet<?>)propertyValue);
         else if (propertyValue instanceof Map<?,?>)
             jsonValue = jsonObjectOfMap((Map<String, ?>) propertyValue);
+        else if (propertyValue instanceof TLASerializer)
+            jsonValue = ((TLASerializer) propertyValue).tlaSerialize();
         else
             jsonValue = jsonObjectOf(propertyValue);
 
@@ -85,7 +87,7 @@ class NDJsonSerializer {
     static JsonObject jsonObjectOf(Object object) {
         final JsonObject jsonObject = new JsonObject();
 
-        for (Field field : object.getClass().getDeclaredFields()) {
+        for (Field field : object.getClass().getFields()) {
 
             if (!field.isAnnotationPresent(TraceField.class))
                 continue;
