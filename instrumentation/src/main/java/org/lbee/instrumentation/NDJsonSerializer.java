@@ -36,8 +36,8 @@ class NDJsonSerializer {
             jsonValue = new JsonPrimitive((Number) propertyValue);
         else if (propertyValue instanceof Character)
             jsonValue = new JsonPrimitive((Character) propertyValue);
-        else if (propertyValue instanceof Enum)
-            jsonValue = new JsonPrimitive(((Enum)propertyValue).ordinal());
+        else if (propertyValue instanceof Enum<?>)
+            jsonValue = new JsonPrimitive(((Enum<?>)propertyValue).ordinal());
         else if (propertyValue instanceof Object[])
             jsonValue = jsonArrayOf((Object[]) propertyValue);
         else if (propertyValue instanceof List<?>)
@@ -45,7 +45,7 @@ class NDJsonSerializer {
         else if (propertyValue instanceof HashSet<?>)
             jsonValue = jsonArrayOf((HashSet<?>)propertyValue);
         else if (propertyValue instanceof Map<?,?>)
-            jsonValue = jsonObjectOfMap((Map<String, ?>) propertyValue);
+            jsonValue = jsonObjectOfMap((Map<?, ?>) propertyValue);
         else if (propertyValue instanceof TLASerializer)
             jsonValue = ((TLASerializer) propertyValue).tlaSerialize();
         else
@@ -109,11 +109,11 @@ class NDJsonSerializer {
         return jsonObject;
     }
 
-    static JsonObject jsonObjectOfMap(Map<String, ?> map) {
+    static JsonObject jsonObjectOfMap(Map<?, ?> map) {
         final JsonObject jsonObject = new JsonObject();
 
-        for (Map.Entry<String, ?> entry : map.entrySet()) {
-            jsonObject.add(entry.getKey(), serializeValue(entry.getValue()));
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            jsonObject.add(entry.getKey().toString(), serializeValue(entry.getValue()));
         }
 
         return jsonObject;
