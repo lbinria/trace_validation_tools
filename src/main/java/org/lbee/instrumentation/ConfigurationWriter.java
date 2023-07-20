@@ -11,8 +11,16 @@ import java.util.Map;
 public class ConfigurationWriter {
 
     public static void write(String path, Map<String, Object> configurationMap) throws IOException {
-        final JsonObject jsonObject = NDJsonSerializer.jsonObjectOfMap(configurationMap);
         final BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+
+        JsonObject jsonObject;
+        try {
+            jsonObject = NDJsonSerializer.jsonObjectOfMap(configurationMap);
+        } catch (IllegalAccessException e) {
+            jsonObject = new JsonObject();
+            jsonObject.addProperty("__exception", e.toString());
+        }
+
         writer.write(jsonObject.toString() + "\n");
         writer.close();
     }

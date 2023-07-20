@@ -6,13 +6,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 class NDJsonSerializer {
 
-    static JsonElement serializeValues(Object... values) {
+    static JsonElement serializeValues(Object... values) throws IllegalAccessException {
 
         final JsonArray jsonArgs = new JsonArray();
 
@@ -23,7 +24,7 @@ class NDJsonSerializer {
         return jsonArgs;
     }
 
-    static JsonElement serializeValue(Object propertyValue) {
+    static JsonElement serializeValue(Object propertyValue) throws IllegalAccessException {
         final JsonElement jsonValue;
 
         if (propertyValue == null)
@@ -54,7 +55,7 @@ class NDJsonSerializer {
         return jsonValue;
     }
 
-    static JsonArray jsonArrayOf(List<?> list) {
+    static JsonArray jsonArrayOf(List<?> list) throws IllegalAccessException {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : list) {
@@ -64,7 +65,7 @@ class NDJsonSerializer {
         return jsonArray;
     }
 
-    static JsonArray jsonArrayOf(HashSet<?> list) {
+    static JsonArray jsonArrayOf(HashSet<?> list) throws IllegalAccessException {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : list) {
@@ -74,7 +75,7 @@ class NDJsonSerializer {
         return jsonArray;
     }
 
-    static JsonArray jsonArrayOf(Object[] array) {
+    static JsonArray jsonArrayOf(Object[] array) throws IllegalAccessException {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : array) {
@@ -84,7 +85,7 @@ class NDJsonSerializer {
         return jsonArray;
     }
 
-    static JsonObject jsonObjectOf(Object object) {
+    static JsonObject jsonObjectOf(Object object) throws IllegalAccessException {
         final JsonObject jsonObject = new JsonObject();
 
         for (Field field : object.getClass().getFields()) {
@@ -93,23 +94,17 @@ class NDJsonSerializer {
                 continue;
 
             final TraceField traceField = field.getAnnotation(TraceField.class);
+            field.setAccessible(true);
+            final String fieldName = traceField.name() != null && !traceField.name().equals("") ? traceField.name() : field.getName();
+            final Object fieldValue = field.get(object);
+            jsonObject.add(fieldName, serializeValue(fieldValue));
 
-            try {
-                field.setAccessible(true);
-                final String fieldName = traceField.name() != null && !traceField.name().equals("") ? traceField.name() : field.getName();
-                final Object fieldValue = field.get(object);
-                jsonObject.add(fieldName, serializeValue(fieldValue));
-
-            } catch (Exception e) {
-                // Nothing
-                e.printStackTrace();
-            }
         }
 
         return jsonObject;
     }
 
-    static JsonObject jsonObjectOfMap(Map<?, ?> map) {
+    static JsonObject jsonObjectOfMap(Map<?, ?> map) throws IllegalAccessException {
         final JsonObject jsonObject = new JsonObject();
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {

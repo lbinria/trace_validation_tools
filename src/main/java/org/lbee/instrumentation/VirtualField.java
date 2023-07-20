@@ -8,18 +8,18 @@ public final class VirtualField {
 
     private final String name;
     private final VirtualField parentField;
-    private final TraceInstrumentation traceInstrumentation;
+    private final BehaviorRecorder behaviorRecorder;
 
     public VirtualField(String name, VirtualField parentField) {
         this.name = name;
         this.parentField = parentField;
-        this.traceInstrumentation = parentField.traceInstrumentation;
+        this.behaviorRecorder = parentField.behaviorRecorder;
     }
 
-    public VirtualField(String name, TraceInstrumentation traceInstrumentation) {
+    public VirtualField(String name, BehaviorRecorder behaviorRecorder) {
         this.name = name;
         this.parentField = null;
-        this.traceInstrumentation = traceInstrumentation;
+        this.behaviorRecorder = behaviorRecorder;
     }
 
     public VirtualField getField(String name) {
@@ -57,7 +57,7 @@ public final class VirtualField {
     }
 
     public void apply(String op, Object... args) {
-        traceInstrumentation.notifyChange(new VirtualUpdate(this, op, List.of(args)));
+        behaviorRecorder.notifyChange(new VirtualUpdate(this, op, List.of(args)));
     }
 
     public List<String> getPath() {
@@ -78,7 +78,7 @@ public final class VirtualField {
         return "VirtualField{" +
                 "name='" + name + '\'' +
                 ", parentField=" + parentField +
-                ", traceInstrumentation=" + traceInstrumentation +
+                ", traceInstrumentation=" + behaviorRecorder +
                 '}';
     }
 }
