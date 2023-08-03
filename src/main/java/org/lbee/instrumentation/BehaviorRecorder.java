@@ -80,7 +80,7 @@ public class BehaviorRecorder {
         notifyChange(update.getVariableName(), update.getOp(), update.getPrefixPath(), update.getArgs());
     }
 
-    public synchronized void commitChanges() throws IOException {
+    public void commitChanges() throws IOException {
         commitChanges("");
     }
 
@@ -89,26 +89,33 @@ public class BehaviorRecorder {
      * @param desc Description of the exception
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public synchronized void commitException(String desc) throws IOException {
+    public void commitException(String desc) throws IOException {
         commitChanges("__exception", desc);
     }
 
-    // Note: I found missing synchronized bug thanks to trace validation
-    public synchronized void commitChanges(String eventName) throws IOException {
+    public void commitChanges(String eventName) throws IOException {
         commitChanges(eventName, "");
     }
 
+    public void commitChanges(String eventName, Object[] args) throws IOException {
+        commitChanges(eventName, args, "");
+    }
+
     public void commitChanges(String eventName, String desc) throws IOException {
+        commitChanges(eventName, new Object[] {}, desc);
+    }
+
+    public void commitChanges(String eventName, Object[] args, String desc) throws IOException {
         // All events are committed at the same logical time (sync)
         // Sync clock
         this.clock = this.globalClock.sync(this.clock);
         // Commit all previously changed variables
-        commitChanges(eventName, desc, this.clock);
+        commitChanges(eventName, desc, args, this.clock);
     }
 
 
-
-    private void commitChanges(String eventName, String desc, long clock) throws IOException {
+    // Note: I found missing synchronized bug thanks to trace validation
+    private synchronized void commitChanges(String eventName, String desc, Object[] args, long clock) throws IOException {
 
         final JsonObject jsonEvent = new JsonObject();
         // Set clock
@@ -128,19 +135,22 @@ public class BehaviorRecorder {
 
             }
 
+            // Set description if filled
+            if (eventName != null && !eventName.equals(""))
+                jsonEvent.addProperty("event", eventName);
+
+            // Set desc if filled
+            if (desc != null && !desc.equals(""))
+                jsonEvent.addProperty("desc", desc);
+
+            if (args != null && args.length > 0)
+                jsonEvent.add("event_args", NDJsonSerializer.jsonArrayOf(args));
+
         } catch (IllegalAccessException e) {
             // Set event to exception, fill description with exception message
             eventName = "__exception";
             desc = e.toString();
         }
-
-        // Set description if filled
-        if (eventName != null && !eventName.equals(""))
-            jsonEvent.addProperty("event", eventName);
-
-        // Set desc if filled
-        if (desc != null && !desc.equals(""))
-            jsonEvent.addProperty("desc", desc);
 
         // Set sender
         jsonEvent.addProperty("sender", this.getGuid());
