@@ -10,7 +10,7 @@ Thanks to a trace validation specification, that is a refinement of a specificat
 
 To make trace validation works, the only things to do are:
 
- - Writing the trace specification on top of your own spec (see part "useful tools" and "templates" below)
+ - Writing the trace specification on top of your own spec (see part [useful tools](#useful-tools) and "templates" below)
  - Use this library in your system / program to log events and variable changes
 
 # How to execute a trace validation ?
