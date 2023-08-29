@@ -42,69 +42,29 @@ from https://github.com/tlaplus/tlaplus/releases/tag/v1.8.0, section
 https://github.com/tlaplus/tlaplus/releases/tag/v1.8.0
 and https://github.com/tlaplus/CommunityModules/releases.
 
-In the scripts in [useful tools](#useful-tools), you need to configure
-the `tla_dir` variable in the script `tla_trace_validation.py` with
-yhe value of your toolbox path.
+The `tla_dir` variable in the script `tla_trace_validation.py` (see
+[useful tools](#useful-tools)) should be set to the value of your toolbox path.
 
 # Install trace validation instrumentation
 
-There are two ways to install instrumentation in your projects. Either get the source, compile, package and install or get the package directly from the github maven registry. 
+There are two ways to use the instrumentation library in your
+projects. Either get the source, compile, package and install it, or
+get the package directly from the github maven registry.
 
-# 1. Install package from sources
+## 1. Install package from sources
 
  - Clone the repository: `git clone https://github.com/lbinria/trace_validation_tools.git`
- - Package and install `mvn package`, `mvn install`
+ - Package and install `mvn install`
 
+## 2. Install package from github maven registry
 
-# 2. Install package from github maven registry
+Add the file [scripts/settings.xml](scripts/settings.xml) to your
+`.m2` directory.
 
-You should add github maven registry repository in maven settings:
-
-In `~/.m2`, create a file named `settings.xml`. Put the following in this file: 
-
-```xml
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
-                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
-
-  <activeProfiles>
-    <activeProfile>github</activeProfile>
-  </activeProfiles>
-
-  <profiles>
-    <profile>
-      <id>github</id>
-      <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub lbinria Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/lbinria/trace_validation_tools</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-          <id>central</id>
-          <url>https://repo1.maven.org/maven2</url>
-        </repository>
-      </repositories>
-    </profile>
-  </profiles>
-
-  <servers>
-    <server>
-      <id>github</id>
-      <username>YOUR_USERNAME</username>
-      <password>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</password>
-    </server>
-  </servers>
-
-</settings>
-```
 # How to use it 
 
-After installing, in your project, add the following to `pom.xml` file:
+Independently of the install method, in the `pom.xml` file of the
+system you should trace add the following dependecy:
 
 ```xml 
 <dependencies>
