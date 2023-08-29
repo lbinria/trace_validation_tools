@@ -14,20 +14,17 @@ possible behavior w.r.t. the specification.
 - Writing the trace specification on top of your own spec (see part [useful tools](#useful-tools) and [templates](#templates) below)
 - Use the primitives provided by the library to log events and variable changes in your system
 - Check the trace(s) produced by the system against the specification:
-    * execute the implementation (containing the tracig primitives)
+    * compile and execute the implementation (containing the tracing primitives)
     * merge the produced trace files (see [useful tools](#useful-tools) and [scripts/trace_merger.py](scripts/trace_merger.py))
     * execute TLC on the trace specification and the generated trace files (see  [useful tools](#useful-tools) and [scripts/tla_trace_validation.py](scripts/trace_merger.py))
 
 # About this repository
 
-This repository contains tools to make and execute a trace validation with the model checker TLC (TLA+).
-
 This repository contains:
 
-- An instrumentation, that aims to trace some events about some state changes of system / program variables
-- Some tools
-   - scripts, that aims to work on trace files
-   - templates, that aims to simplify the writing of trace specification
+- An instrumentation library which can be used to trace events and state changes of a
+- Scripts to manipulate and check trace files
+- Templates that aim to simplify the writing of trace specifications
 
 # Prerequisite
 
@@ -36,13 +33,18 @@ This repository contains:
 - Python >= 3.9.12
 - TLA+ >= 1.8.0 (The Clarke release)
 
-## Install TLA+
+### Install TLA+ tools
 
- - Go to https://github.com/tlaplus/tlaplus/releases/tag/v1.8.0
- - Go to "Assets"
- - Download the toolbox (accordingly to your OS)
- - Unzip the toolbox somewhere
- - If you want to use the scripts (see "useful tools" part below), you need to configure the `tla_dir` variable in the script `tla_trace_validation.py` with value of your toolbox path 
+Create a directory and add the latest versions `tla2tools.jar` and
+`CommunityModules-deps.jar`. You do this either by installing the TLA+ toolbox
+from https://github.com/tlaplus/tlaplus/releases/tag/v1.8.0, section
+"Assets", or just the download the jars from
+https://github.com/tlaplus/tlaplus/releases/tag/v1.8.0
+and https://github.com/tlaplus/CommunityModules/releases.
+
+In the scripts in [useful tools](#useful-tools), you need to configure
+the `tla_dir` variable in the script `tla_trace_validation.py` with
+yhe value of your toolbox path.
 
 # Install trace validation instrumentation
 
