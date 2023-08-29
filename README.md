@@ -1,16 +1,19 @@
 # What is trace validation ?
 
-If you describe a system or a program with a formal specification, particularly a TLA+ formalism, you may have to want to see that your implementation of the specification is correct. 
+If you describe a system or a program with a formal specification, particularly a TLA+ formalism, you may have to your implementation against the specification. 
 
-To do that, you can use our tools `trace_validation_tools`. These tools enable you to "log" some events and some values and modifications of some variables during the execution.
+To do that, you can use our `trace_validation_tools`. First, these
+tools provide primitives allowing one to log some selected events and
+variables during the execution.  Then, thanks to a trace validation
+specification, that is a refinement of the formal specification of the
+system, one can check if an execution of the system matches with a
+possible behavior w.r.t. the specification.
 
-Thanks to a trace validation specification, that is a refinement of a specification of your system or program, you can check if an execution of this system matches with a possible behavior of that specification.
-
-# How to make a trace validation ?
+# How to perform a trace validation ?
 
 To make trace validation works, the only things to do are:
 
- - Writing the trace specification on top of your own spec (see part "useful tools" and "templates" below)
+ - Writing the trace specification on top of your own spec (see part [useful tools](#useful-tools) and "templates" below)
  - Use this library in your system / program to log events and variable changes
 
 # How to execute a trace validation ?
