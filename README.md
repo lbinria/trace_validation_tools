@@ -16,7 +16,7 @@ possible behavior w.r.t. the specification.
 - Check the trace(s) produced by the system against the specification:
     * compile and execute the implementation (containing the tracing primitives)
     * merge the produced trace files (see [useful tools](#useful-tools) and [scripts/trace_merger.py](scripts/trace_merger.py))
-    * execute TLC on the trace specification and the generated trace files (see  [useful tools](#useful-tools) and [scripts/tla_trace_validation.py](scripts/trace_merger.py))
+    * execute TLC on the trace specification and the generated trace files (see [useful tools](#useful-tools) and [scripts/tla_trace_validation.py](scripts/tla_trace_validation.py))
 
 # About this repository
 
@@ -78,35 +78,28 @@ system you should trace add the following dependecy:
 
 # Useful tools
 
-Trace instrumentation tools gives some useful scripts and templates that you can copy and use in your projects. Scripts allow you to merge traces issued from different processes, run a trace validation on a trace file, etc. Templates are generic tla files that you need to fill to create a new trace specifications more easily.
-
 ## Scripts
 
-You can find scripts in the `scripts` directory.
-You can copy these scripts into your project to execute a trace validation pipeline for example (see https://github.com/lbinria/TicTac). 
+The Python script [scripts/trace_merger.py](scripts/trace_merger.py))
+can be used to merge multiple trace files (from several concurrent
+processes) passed as parameter into a single one. For example, two
+trace files can be merged with
 
-### `trace_merger.py` 
+`python trace_merger.py trace_1.ndjson trace_2.ndjson --config system.ndjson.config --sort True`
 
-This script enable to merge multiple trace files into a single one.
-
-#### Use 
-
-Give a list of trace files to merge.
-
-`python trace_merger.py trace_1.ndjson trace_2.ndjson [...] --config system.ndjson.config  --sort True`
-
-### `tla_trace_validation.py`
-
-This script enable to execute TLC on a given trace specification.
-
-#### Use 
+The Python script
+[scripts/tla_trace_validation.py](scripts/tla_trace_validation.py))
+can be used to check using TLC a given trace w.r.t. a trace
+specification. For example,
 
 `python tla_trace_validation.py myTraceSpec.tla trace.ndjson`
 
 ## Templates
 
-You can find templates in the `templates` directory. You can copy these templates and adapt them accordingly to your base specification (see example: https://github.com/lbinria/TicTac).
+[Templates](templates) in are generic `tla` files that can be adapted according to a
+base specification. 
 
 # Tutorial
 
-You can find a tutorial at https://github.com/lbinria/TicTac
+You can find a simple example of using the library, the scripts and the
+templates at https://github.com/lbinria/TicTac.
