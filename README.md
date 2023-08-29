@@ -14,9 +14,9 @@ possible behavior w.r.t. the specification.
 - Writing the trace specification on top of your own spec (see part [useful tools](#useful-tools) and [templates](#templates) below)
 - Use the primitives provided by the library to log events and variable changes in your system
 - Check the trace(s) produced by the system against the specification:
- + execute the implementation (containing the tracig primitives)
- + merge the produced trace files (see [useful tools](#useful-tools) and [scripts/trace_merger.py](scripts/trace_merger.py))
- + execute TLC on the trace specification and the generated trace files (see  [useful tools](#useful-tools) and [scripts/tla_trace_validation.py](scripts/trace_merger.py))
+    * execute the implementation (containing the tracig primitives)
+    * merge the produced trace files (see [useful tools](#useful-tools) and [scripts/trace_merger.py](scripts/trace_merger.py))
+    * execute TLC on the trace specification and the generated trace files (see  [useful tools](#useful-tools) and [scripts/tla_trace_validation.py](scripts/trace_merger.py))
 
 # About this repository
 
