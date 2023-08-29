@@ -11,18 +11,12 @@ possible behavior w.r.t. the specification.
 
 # How to perform a trace validation ?
 
-To make trace validation works, the only things to do are:
-
- - Writing the trace specification on top of your own spec (see part [useful tools](#useful-tools) and "templates" below)
- - Use this library in your system / program to log events and variable changes
-
-# How to execute a trace validation ?
-
-Once previous steps are made, you can execute a trace validation by following the next pipeline: 
-
- - execute your implementation
- - merge the produced trace files (see "useful tools" and "scripts/trace_merger.py" below)
- - execute TLC onto the trace specification and the generated trace files (see "usefuls tools" and "scripts/tla_trace_validation.py")
+- Writing the trace specification on top of your own spec (see part [useful tools](#useful-tools) and [templates](#templates) below)
+- Use the primitives provided by the library to log events and variable changes in your system
+- Check the trace(s) produced by the system against the specification:
+ + execute the implementation (containing the tracig primitives)
+ + merge the produced trace files (see [useful tools](#useful-tools) and [scripts/trace_merger.py](scripts/trace_merger.py))
+ + execute TLC on the trace specification and the generated trace files (see  [useful tools](#useful-tools) and [scripts/tla_trace_validation.py](scripts/trace_merger.py))
 
 # About this repository
 
