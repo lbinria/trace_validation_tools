@@ -105,7 +105,8 @@ public class BehaviorRecorder {
         commitChanges(eventName, new Object[] {}, desc);
     }
 
-    public void commitChanges(String eventName, Object[] args, String desc) throws IOException {
+    // Note: I found missing synchronized bug thanks to trace validation
+    public synchronized void commitChanges(String eventName, Object[] args, String desc) throws IOException {
         // All events are committed at the same logical time (sync)
         // Sync clock
         this.clock = this.globalClock.sync(this.clock);
@@ -114,8 +115,7 @@ public class BehaviorRecorder {
     }
 
 
-    // Note: I found missing synchronized bug thanks to trace validation
-    private synchronized void commitChanges(String eventName, String desc, Object[] args, long clock) throws IOException {
+    private void commitChanges(String eventName, String desc, Object[] args, long clock) throws IOException {
 
         final JsonObject jsonEvent = new JsonObject();
         // Set clock
