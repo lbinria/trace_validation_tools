@@ -92,7 +92,7 @@ The Python script
 can be used to check using TLC a given trace w.r.t. a trace
 specification. For example,
 
-`python tla_trace_validation.py myTraceSpec.tla trace.ndjson`
+`python tla_trace_validation.py myTraceSpec.tla --trace trace.ndjson`
 
 ## Templates
 
