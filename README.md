@@ -63,8 +63,8 @@ Add the file [scripts/settings.xml](scripts/settings.xml) to your
 
 # How to use it 
 
-Independently of the install method, in the `pom.xml` file of the
-system you should trace add the following dependecy:
+Independently of the installation method, in the `pom.xml` file of the
+system you should trace add the following dependency:
 
 ```xml 
 <dependencies>
