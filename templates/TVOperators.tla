@@ -31,8 +31,8 @@ RemoveFromBag(cur, val) ==
     ELSE
         cur
 
-Add(cur, val) == cur + val
-Sub(cur, val) == cur - val
+AddInteger(cur, val) == cur + val
+SubInteger(cur, val) == cur - val
 
 Unchanged(cur, val) == cur
 
@@ -44,7 +44,8 @@ Apply(var, default, op, args) ==
     []   op = "RemoveElement" -> RemoveElement(var, args[1])
     []   op = "AddToBag" -> AddToBag(var, args[1])
     []   op = "RemoveFromBag" -> RemoveFromBag(var, args[1])
-    []   op = "Add" -> Add(var, args[1])
+    []   op = "Add" -> AddInteger(var, args[1])
+    []   op = "Sub" -> SubInteger(var, args[1])
     []   op = "Clear" -> Clear(var, <<>>)
     []   op = "AppendElement" -> AppendElement(var, args[1])
     []   op = "RemoveKey" -> RemoveKey(var, args[1])
@@ -83,6 +84,6 @@ LOCAL ApplyUpdates(var, varName, updates, event) ==
         applied
 
 MapVariable(var, varName, logline) ==
-    LET event == IF "desc" \in DOMAIN logline THEN logline.desc ELSE "" IN
+    LET event == IF "event" \in DOMAIN logline THEN logline.event ELSE "" IN
     ApplyUpdates(var, varName, logline[varName], event)
 ====
