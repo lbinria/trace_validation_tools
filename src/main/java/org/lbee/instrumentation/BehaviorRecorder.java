@@ -7,8 +7,10 @@ import org.lbee.instrumentation.clock.InstrumentationClock;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class BehaviorRecorder {
 
@@ -30,11 +32,6 @@ public class BehaviorRecorder {
     // public void sync(long clock) {
     //     this.clock.sync(clock);
     // }
-
-    private String generateTracePath() {
-        final String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(Calendar.getInstance().getTime());
-        return timeStamp + "-" + getGuid() + ".ndjson";
-    }
 
     protected BehaviorRecorder(BufferedWriter writer, InstrumentationClock clock) {
         this.clock = 0L;
@@ -63,15 +60,27 @@ public class BehaviorRecorder {
         }
     }
 
-    public void notifyChange(String variableName, String action, List<String> path, List<Object> args) {
+    /**
+     * Notify the modification of the value of a variable
+     * @param variableName The name of the variable that is modified
+     * @param operator Operator applied to the variable
+     * @param path Path of the variable that is modified (e.g: 'firstname' for a record person)
+     * @param args Arguments used in operator
+     */
+    public void notifyChange(String variableName, String operator, List<String> path, List<Object> args) {
 
         if (!updates.containsKey(variableName))
             updates.put(variableName, new ArrayList<>());
 
         // Add action to variable
-        updates.get(variableName).add(new TraceItem(action, path, args));
+        updates.get(variableName).add(new TraceItem(operator, path, args));
     }
 
+    /**
+     * Get a virtual variable, that serve to notify change later
+     * @param name Name of the variable
+     * @return A virtual variable on which you can notify changes
+     */
     public VirtualField getVariable(String name) {
         return new VirtualField(name, this);
     }
@@ -93,25 +102,93 @@ public class BehaviorRecorder {
         commitChanges("__exception", desc);
     }
 
+    /**
+     * Commit all variable changes in batch
+     * @param eventName Name of the event that is committed (may correspond with action name in TLA+ for example)
+     * @throws IOException
+     */
     public void commitChanges(String eventName) throws IOException {
         commitChanges(eventName, "");
     }
 
+    /**
+     * Commit all variable changes in batch
+     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
+     * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
+     * @throws IOException
+     */
     public void commitChanges(String eventName, Object[] args) throws IOException {
         commitChanges(eventName, args, "");
     }
 
+    /**
+     * Commit all variable changes in batch
+     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
+     * @param desc Description of the commit (custom message)
+     * @throws IOException
+     */
     public void commitChanges(String eventName, String desc) throws IOException {
         commitChanges(eventName, new Object[] {}, desc);
     }
 
     // Note: I found missing synchronized bug thanks to trace validation
+    /**
+     * Commit all variable changes in batch
+     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
+     * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
+     * @param desc Description of the commit (custom message)
+     * @throws IOException
+     */
     public synchronized void commitChanges(String eventName, Object[] args, String desc) throws IOException {
         // All events are committed at the same logical time (sync)
         // Sync clock
         this.clock = this.globalClock.sync(this.clock);
         // Commit all previously changed variables
         commitChanges(eventName, desc, args, this.clock);
+    }
+
+
+    /**
+     * Token to know if a transaction for a commit is open (experimental)
+     */
+    private boolean isTransactionOpen;
+
+    /**
+     * Experimental: Begin commit changes transaction and sync clock at the same time
+     * The value of the clock will be used when we close our transaction (endCommit)
+     * This method is useful to keep chronological order when logging some code like network message:
+     * If we use commitChanges AFTER the message send, it is possible that another process log something before
+     * that commitChanges is applied. It led to have a trace that log action of the process that receive message BEFORE the message is sent.
+     * Another way to deal with that is to call commitChanges BEFORE the message send but if the message send fail
+     * The trace remains correct at this point when it shouldn't be. However... in long term it's not really a problem because
+     * generally it will lead to an incorrect trace, that's why it's an experimental feature.
+     * @throws IOException
+     */
+    public synchronized void beginCommit() throws IOException {
+        if (isTransactionOpen)
+            throw new IOException("A transaction is already open.");
+
+        this.clock = this.globalClock.sync(this.clock);
+        isTransactionOpen = true;
+    }
+
+    /**
+     * Experimental: Commit the commit changes transaction and use the latest sync clock
+     * @param eventName
+     * @throws IOException
+     */
+    public void endCommit(String eventName) throws IOException {
+        endCommit(eventName, new Object[]{}, "");
+    }
+
+    public void endCommit(String eventName, Object[] args, String desc) throws IOException {
+        if (!isTransactionOpen)
+            throw new IOException("No transactions have been opened.");
+
+        // Commit all previously changed variables
+        commitChanges(eventName, desc, args, this.clock);
+
+        isTransactionOpen = false;
     }
 
 
