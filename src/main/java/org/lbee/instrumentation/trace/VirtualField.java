@@ -9,17 +9,25 @@ public final class VirtualField {
     private final String name;
     private final VirtualField parentField;
     private final TLATracer behaviorRecorder;
+    private final String var;
+    private final List<String> path;
 
     public VirtualField(String name, VirtualField parentField) {
         this.name = name;
         this.parentField = parentField;
         this.behaviorRecorder = parentField.behaviorRecorder;
+        List<String> fullPath = this.getPath();
+        this.var = fullPath.get(0);
+        this.path = fullPath.subList(1, fullPath.size());
     }
 
     public VirtualField(String name, TLATracer behaviorRecorder) {
         this.name = name;
         this.parentField = null;
         this.behaviorRecorder = behaviorRecorder;
+        List<String> fullPath = this.getPath();
+        this.var = fullPath.get(0);
+        this.path = fullPath.subList(1, fullPath.size());
     }
 
     public VirtualField getField(String name) {
@@ -30,7 +38,9 @@ public final class VirtualField {
         apply("Replace", val);
     }
 
-    public void addAll(Collection<?> vals) { apply("AddElements", vals); }
+    public void addAll(Collection<?> vals) {
+        apply("AddElements", vals);
+    }
 
     public void add(Object val) {
         apply("AddElement", val);
@@ -57,15 +67,14 @@ public final class VirtualField {
     }
 
     public void apply(String op, Object... args) {
-        // behaviorRecorder.notifyChange(new VirtualUpdate(this, op, List.of(args)));
-        behaviorRecorder.notifyChange(this.getPath().get(0),op,this.getPath().subList(1,this.getPath().size()),List.of(args));
+        behaviorRecorder.notifyChange(this.var, op, this.path, List.of(args));
     }
 
-    public List<String> getPath() {
+    private List<String> getPath() {
         final List<String> path;
 
         if (parentField == null) {
-             path = new ArrayList<>();
+            path = new ArrayList<>();
         } else {
             path = parentField.getPath();
         }
