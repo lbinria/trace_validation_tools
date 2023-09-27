@@ -20,12 +20,15 @@ public class BehaviorRecorder {
     private long clock;
     // Global clock
     private final InstrumentationClock globalClock;
-    // Writer to write event to file
+    // Writer that write event to file
     private final BufferedWriter writer;
-    // Updates that happens on a variable
+    // Updates that happens on a variable (modifications batch)
     private final HashMap<String, List<TraceItem>> updates;
 
-    // Get instrumentation guid
+    /**
+     * Get instrumentation guid
+     * @return Unique id of instrumentation
+     */
     public String getGuid() { return guid; }
 
     // Sync internal instrumentation clock with another clock
@@ -33,6 +36,11 @@ public class BehaviorRecorder {
     //     this.clock.sync(clock);
     // }
 
+    /**
+     * Construct a new instrumentation
+     * @param writer The buffer that write trace to an output stream
+     * @param clock The clock used when logging
+     */
     protected BehaviorRecorder(BufferedWriter writer, InstrumentationClock clock) {
         this.clock = 0L;
         this.globalClock = clock;
@@ -85,10 +93,18 @@ public class BehaviorRecorder {
         return new VirtualField(name, this);
     }
 
+    /**
+     * Notify the modification of the value of a variable
+     * @param update The virtual update to notify
+     */
     public void notifyChange(VirtualUpdate update) {
         notifyChange(update.getVariableName(), update.getOp(), update.getPrefixPath(), update.getArgs());
     }
 
+    /**
+     * Commit changes without specifying event name
+     * @throws IOException Thrown when unable to write event in trace file
+     */
     public void commitChanges() throws IOException {
         commitChanges("");
     }
@@ -105,7 +121,7 @@ public class BehaviorRecorder {
     /**
      * Commit all variable changes in batch
      * @param eventName Name of the event that is committed (may correspond with action name in TLA+ for example)
-     * @throws IOException
+     * @throws IOException Thrown when unable to write event in trace file
      */
     public void commitChanges(String eventName) throws IOException {
         commitChanges(eventName, "");
@@ -115,7 +131,7 @@ public class BehaviorRecorder {
      * Commit all variable changes in batch
      * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
      * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
-     * @throws IOException
+     * @throws IOException Thrown when unable to write event in trace file
      */
     public void commitChanges(String eventName, Object[] args) throws IOException {
         commitChanges(eventName, args, "");
@@ -125,7 +141,7 @@ public class BehaviorRecorder {
      * Commit all variable changes in batch
      * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
      * @param desc Description of the commit (custom message)
-     * @throws IOException
+     * @throws IOException Thrown when unable to write event in trace file
      */
     public void commitChanges(String eventName, String desc) throws IOException {
         commitChanges(eventName, new Object[] {}, desc);
@@ -137,7 +153,7 @@ public class BehaviorRecorder {
      * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
      * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
      * @param desc Description of the commit (custom message)
-     * @throws IOException
+     * @throws IOException Thrown when unable to write event in trace file
      */
     public synchronized void commitChanges(String eventName, Object[] args, String desc) throws IOException {
         // All events are committed at the same logical time (sync)
@@ -191,7 +207,14 @@ public class BehaviorRecorder {
         isTransactionOpen = false;
     }
 
-
+    /**
+     * Commit all variable changes in batch
+     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
+     * @param desc Description of the commit (custom message)
+     * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
+     * @param clock Instrumentation current clock value
+     * @throws IOException Thrown when unable to write event in trace file
+     */
     private void commitChanges(String eventName, String desc, Object[] args, long clock) throws IOException {
 
         final JsonObject jsonEvent = new JsonObject();
