@@ -1,10 +1,10 @@
-package org.lbee.instrumentation;
+package org.lbee.instrumentation.trace;
 
 import java.util.List;
 
 import com.google.gson.JsonObject;
 
-public class TraceItem {
+class TraceItem {
     private final String action;
     private List<String> path;
     private final List<Object> args;

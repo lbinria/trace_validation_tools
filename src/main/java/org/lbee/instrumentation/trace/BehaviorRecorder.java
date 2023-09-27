@@ -1,4 +1,4 @@
-package org.lbee.instrumentation;
+package org.lbee.instrumentation.trace;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
