@@ -46,6 +46,10 @@ TraceInit ==
     /\ l = 1
     /\ BaseInit
 
+IsStuttering ==
+    /\ IsEvent("Stuttering")
+    /\ UNCHANGED Vars
+
 TraceSpec ==
     \* Because of  [A]_v <=> A \/ v=v'  , the following formula is logically
      \* equivalent to the (canonical) Spec formual  Init /\ [][Next]_vars  .
@@ -53,7 +57,7 @@ TraceSpec ==
      \* states of a *seen* state.  Since one or more states may appear one or
      \* more times in the the trace, the  UNCHANGED vars  combined with the
      \*  TraceView  that includes  TLCGet("level")  is our workaround.
-    TraceInit /\ [][TraceNext]_<<l, Vars>>
+    TraceInit /\ [][TraceNext \/ IsStuttering]_<<l, Vars>>
 
 TraceAccepted ==
     LET d == TLCGet("stats").diameter IN
