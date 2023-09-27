@@ -89,8 +89,8 @@ public class TLATracer {
      * Commit changes without specifying event name
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void commitChanges() throws IOException {
-        commitChanges("");
+    public void log() throws IOException {
+        log("");
     }
 
     /**
@@ -98,8 +98,8 @@ public class TLATracer {
      * @param eventName Name of the event that is committed (may correspond with action name in TLA+ for example)
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void commitChanges(String eventName) throws IOException {
-        commitChanges(eventName, "");
+    public void log(String eventName) throws IOException {
+        log(eventName, "");
     }
 
     /**
@@ -108,8 +108,8 @@ public class TLATracer {
      * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void commitChanges(String eventName, Object[] args) throws IOException {
-        commitChanges(eventName, args, "");
+    public void log(String eventName, Object[] args) throws IOException {
+        log(eventName, args, "");
     }
 
     /**
@@ -118,8 +118,8 @@ public class TLATracer {
      * @param desc Description of the commit (custom message)
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void commitChanges(String eventName, String desc) throws IOException {
-        commitChanges(eventName, new Object[] {}, desc);
+    public void log(String eventName, String desc) throws IOException {
+        log(eventName, new Object[] {}, desc);
     }
 
     // Note: I found missing synchronized bug thanks to trace validation
@@ -130,12 +130,12 @@ public class TLATracer {
      * @param desc Description of the commit (custom message)
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public synchronized void commitChanges(String eventName, Object[] args, String desc) throws IOException {
+    public synchronized void log(String eventName, Object[] args, String desc) throws IOException {
         // All events are committed at the same logical time (sync)
         // Sync clock
         this.clock = this.globalClock.sync(this.clock);
         // Commit all previously changed variables
-        commit(eventName, args, desc, this.clock);
+        logChanges(eventName, args, desc, this.clock);
     }
 
     /**
@@ -143,8 +143,8 @@ public class TLATracer {
      * @param desc Description of the exception
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void commitException(String desc) throws IOException {
-        commitChanges("__exception", desc);
+    public void logException(String desc) throws IOException {
+        log("__exception", desc);
     }
 
     /**
@@ -167,7 +167,7 @@ public class TLATracer {
      * generally it will lead to an incorrect trace, that's why it's an experimental feature.
      * @throws IOException
      */
-    public synchronized void beginCommit() throws IOException {
+    public synchronized void startLog() throws IOException {
         this.clock = this.globalClock.sync(this.clock);
     }
 
@@ -176,16 +176,16 @@ public class TLATracer {
      * @param eventName
      * @throws IOException
      */
-    public void endCommit(String eventName) throws IOException {
-        endCommit(eventName, new Object[]{}, "");
+    public void endLog(String eventName) throws IOException {
+        endLog(eventName, new Object[]{}, "");
     }
 
-    public void endCommit(String eventName, Object[] args, String desc) throws IOException {
+    public void endLog(String eventName, Object[] args, String desc) throws IOException {
         if (this.clock < 0)
             throw new IOException("No transactions have been opened.");
 
         // Commit all previously changed variables
-        commit(eventName, args, desc, this.clock);
+        logChanges(eventName, args, desc, this.clock);
 
         this.clock = -1;
     }
@@ -198,7 +198,7 @@ public class TLATracer {
      * @param clock Instrumentation current clock value
      * @throws IOException Thrown when unable to write event in trace file
      */
-    private void commit(String eventName, Object[] args, String desc, long clock) throws IOException {
+    private void logChanges(String eventName, Object[] args, String desc, long clock) throws IOException {
 
         final JsonObject jsonEvent = new JsonObject();
         // Set clock
