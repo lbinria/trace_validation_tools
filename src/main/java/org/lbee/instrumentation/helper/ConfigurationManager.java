@@ -1,4 +1,4 @@
-package org.lbee.instrumentation;
+package org.lbee.instrumentation.helper;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -8,7 +8,7 @@ import com.google.gson.JsonParser;
 import java.io.*;
 import java.util.Map;
 
-public class ConfigurationWriter {
+public class ConfigurationManager {
 
     public static void write(String path, Map<String, Object> configurationMap) throws IOException {
         final BufferedWriter writer = new BufferedWriter(new FileWriter(path));

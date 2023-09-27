@@ -1,4 +1,4 @@
-package org.lbee.instrumentation;
+package org.lbee.instrumentation.trace;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,7 +8,7 @@ public final class VirtualField {
 
     private final String name;
     private final VirtualField parentField;
-    private final BehaviorRecorder behaviorRecorder;
+    private final TLATracer behaviorRecorder;
 
     public VirtualField(String name, VirtualField parentField) {
         this.name = name;
@@ -16,7 +16,7 @@ public final class VirtualField {
         this.behaviorRecorder = parentField.behaviorRecorder;
     }
 
-    public VirtualField(String name, BehaviorRecorder behaviorRecorder) {
+    public VirtualField(String name, TLATracer behaviorRecorder) {
         this.name = name;
         this.parentField = null;
         this.behaviorRecorder = behaviorRecorder;
@@ -57,7 +57,8 @@ public final class VirtualField {
     }
 
     public void apply(String op, Object... args) {
-        behaviorRecorder.notifyChange(new VirtualUpdate(this, op, List.of(args)));
+        // behaviorRecorder.notifyChange(new VirtualUpdate(this, op, List.of(args)));
+        behaviorRecorder.notifyChange(this.getPath().get(0),op,this.getPath().subList(1,this.getPath().size()),List.of(args));
     }
 
     public List<String> getPath() {

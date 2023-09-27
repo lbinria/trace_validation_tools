@@ -1,4 +1,4 @@
-package org.lbee.instrumentation;
+package org.lbee.instrumentation.helper;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-class NDJsonSerializer {
+public class NDJsonSerializer {
 
     static JsonElement serializeValues(Object... values) throws IllegalAccessException {
 
@@ -50,12 +50,12 @@ class NDJsonSerializer {
         else if (propertyValue instanceof TLASerializer)
             jsonValue = ((TLASerializer) propertyValue).tlaSerialize();
         else
-            jsonValue = jsonObjectOf(propertyValue);
+            throw new IllegalAccessException("Unknown");
 
         return jsonValue;
     }
 
-    static JsonArray jsonArrayOf(List<?> list) throws IllegalAccessException {
+    public static JsonArray jsonArrayOf(List<?> list) throws IllegalAccessException {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : list) {
@@ -65,7 +65,7 @@ class NDJsonSerializer {
         return jsonArray;
     }
 
-    static JsonArray jsonArrayOf(HashSet<?> list) throws IllegalAccessException {
+    public static JsonArray jsonArrayOf(HashSet<?> list) throws IllegalAccessException {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : list) {
@@ -75,7 +75,7 @@ class NDJsonSerializer {
         return jsonArray;
     }
 
-    static JsonArray jsonArrayOf(Object[] array) throws IllegalAccessException {
+    public static JsonArray jsonArrayOf(Object[] array) throws IllegalAccessException {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : array) {
@@ -85,26 +85,7 @@ class NDJsonSerializer {
         return jsonArray;
     }
 
-    static JsonObject jsonObjectOf(Object object) throws IllegalAccessException {
-        final JsonObject jsonObject = new JsonObject();
-
-        for (Field field : object.getClass().getFields()) {
-
-            if (!field.isAnnotationPresent(TraceField.class))
-                continue;
-
-            final TraceField traceField = field.getAnnotation(TraceField.class);
-            field.setAccessible(true);
-            final String fieldName = traceField.name() != null && !traceField.name().equals("") ? traceField.name() : field.getName();
-            final Object fieldValue = field.get(object);
-            jsonObject.add(fieldName, serializeValue(fieldValue));
-
-        }
-
-        return jsonObject;
-    }
-
-    static JsonObject jsonObjectOfMap(Map<?, ?> map) throws IllegalAccessException {
+    public static JsonObject jsonObjectOfMap(Map<?, ?> map) throws IllegalAccessException {
         final JsonObject jsonObject = new JsonObject();
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {

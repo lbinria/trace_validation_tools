@@ -1,5 +1,6 @@
 package org.lbee.instrumentation.trace;
 
+import org.lbee.instrumentation.helper.NDJsonSerializer;
 import java.util.List;
 
 import com.google.gson.JsonObject;

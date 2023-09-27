@@ -1,4 +1,4 @@
-package org.lbee.instrumentation;
+package org.lbee.instrumentation.helper;
 
 import com.google.gson.JsonElement;
 
