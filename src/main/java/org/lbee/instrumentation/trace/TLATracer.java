@@ -28,17 +28,21 @@ public class TLATracer {
 
     /**
      * Get instrumentation guid
+     * 
      * @return Unique id of instrumentation
      */
-    public String getGuid() { return guid; }
+    public String getGuid() {
+        return guid;
+    }
 
     /**
      * Construct a new instrumentation
+     * 
      * @param writer The buffer that write trace to an output stream
-     * @param clock The clock used when logging
+     * @param clock  The clock used when logging
      */
     private TLATracer(BufferedWriter writer, InstrumentationClock clock) {
-        this.clock = -1;
+        // this.clock = -1;
         this.globalClock = clock;
         // Set unique id
         this.guid = UUID.randomUUID().toString();
@@ -46,12 +50,14 @@ public class TLATracer {
         this.updates = new HashMap<>();
         // Set writer
         this.writer = writer;
+        this.clock = this.globalClock.sync(-1);
     }
 
     /**
      * Create new instrumentation
+     * 
      * @param tracePath Path of file where the trace will be recorded
-     * @param clock Clock used for sync
+     * @param clock     Clock used for sync
      * @return A new instrumentation or null if unable to create the trace file
      */
     public static TLATracer getTracer(String tracePath, InstrumentationClock clock) {
@@ -66,10 +72,12 @@ public class TLATracer {
 
     /**
      * Notify the modification of the value of a variable
+     * 
      * @param variableName The name of the variable that is modified
-     * @param operator Operator applied to the variable
-     * @param path Path of the variable that is modified (e.g: 'firstname' for a record person)
-     * @param args Arguments used in operator
+     * @param operator     Operator applied to the variable
+     * @param path         Path of the variable that is modified (e.g: 'firstname'
+     *                     for a record person)
+     * @param args         Arguments used in operator
      */
     public void notifyChange(String variableName, String operator, List<String> path, List<Object> args) {
         if (!updates.containsKey(variableName)) {
@@ -81,6 +89,7 @@ public class TLATracer {
 
     /**
      * Commit an exception catch from implementation
+     * 
      * @param desc Description of the exception
      * @throws IOException Thrown when unable to write event in trace file
      */
@@ -90,47 +99,64 @@ public class TLATracer {
 
     /**
      * Get a virtual variable, that serve to notify change later
-     * @param name Name of the variable
+     * 
+     * @param variableName Name of the variable
      * @return A virtual variable on which you can notify changes
      */
-    public VirtualField getVariable(String name) {
-        return new VirtualField(name, this);
+    public VirtualField getVariableTracer(String variableName) {
+        return new VirtualField(variableName, this);
     }
 
     /**
      * The value of the clock will be used when we close our transaction (endCommit)
-     * This method is useful to keep chronological order when logging some code like network message:
-     * If we use commitChanges AFTER the message send, it is possible that another process log something before
-     * that commitChanges is applied. It led to have a trace that log action of the process that receive message BEFORE the message is sent.
-     * Another way to deal with that is to call commitChanges BEFORE the message send but if the message send fail
-     * The trace remains correct at this point when it shouldn't be. However... in long term it's not really a problem because
-     * generally it will lead to an incorrect trace, that's why it's an experimental feature.
+     * This method is useful to keep chronological order when logging some code like
+     * network message:
+     * If we use commitChanges AFTER the message send, it is possible that another
+     * process log something before
+     * that commitChanges is applied. It led to have a trace that log action of the
+     * process that receive message BEFORE the message is sent.
+     * Another way to deal with that is to call commitChanges BEFORE the message
+     * send but if the message send fail
+     * The trace remains correct at this point when it shouldn't be. However... in
+     * long term it's not really a problem because
+     * generally it will lead to an incorrect trace, that's why it's an experimental
+     * feature.
+     * 
      * @throws IOException
      */
     public void startLog() throws IOException {
+        // this.clock = this.globalClock.sync(this.clock);
+    }
+
+    /**
+     * Commit all variable changes in batch
+     * 
+     * @param eventName Name of the event that is committed (may correspond to
+     *                  action name in TLA+ for example)
+     * @param args      Arguments of the event that is committed (may correspond to
+     *                  action arguments in TLA+ for example)
+     * @param desc      Description of the commit (custom message)
+     * @throws IOException Thrown when unable to write event in trace file
+     */
+    public void endLog(String eventName, Object[] args, String desc) throws IOException {
+        // if (this.clock < 0) {
+        // throw new IOException("No transactions have been opened.");
+        // }
+        // // Commit all previously changed variables
+        // this.logChanges(eventName, args, desc, this.clock);
+        // this.clock = -1;
+
+        // Commit all previously changed variables
+        this.logChanges(eventName, args, desc, this.clock);
         this.clock = this.globalClock.sync(this.clock);
     }
 
     /**
      * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
-     * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
-     * @param desc Description of the commit (custom message)
-     * @throws IOException Thrown when unable to write event in trace file
-     */
-    public void endLog(String eventName, Object[] args, String desc) throws IOException {
-        if (this.clock < 0) {
-            throw new IOException("No transactions have been opened.");
-        }
-        // Commit all previously changed variables
-        this.logChanges(eventName, args, desc, this.clock);
-        this.clock = -1;
-    }
-
-    /**
-     * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
-     * @param desc Description of the commit (custom message)
+     * 
+     * @param eventName Name of the event that is committed (may correspond to
+     *                  action name in TLA+ for example)
+     * @param desc      Description of the commit (custom message)
      * @throws IOException Thrown when unable to write event in trace file
      */
     public void endLog(String eventName, String desc) throws IOException {
@@ -139,8 +165,11 @@ public class TLATracer {
 
     /**
      * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
-     * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
+     * 
+     * @param eventName Name of the event that is committed (may correspond to
+     *                  action name in TLA+ for example)
+     * @param args      Arguments of the event that is committed (may correspond to
+     *                  action arguments in TLA+ for example)
      * @throws IOException Thrown when unable to write event in trace file
      */
     public void endLog(String eventName, Object[] args) throws IOException {
@@ -149,7 +178,9 @@ public class TLATracer {
 
     /**
      * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
+     * 
+     * @param eventName Name of the event that is committed (may correspond to
+     *                  action name in TLA+ for example)
      * @throws IOException Thrown when unable to write event in trace file
      */
     public void endLog(String eventName) throws IOException {
@@ -158,7 +189,9 @@ public class TLATracer {
 
     /**
      * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
+     * 
+     * @param eventName Name of the event that is committed (may correspond to
+     *                  action name in TLA+ for example)
      * @throws IOException Thrown when unable to write event in trace file
      */
     public void endLog() throws IOException {
@@ -167,10 +200,13 @@ public class TLATracer {
 
     /**
      * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
-     * @param desc Description of the commit (custom message)
-     * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
-     * @param clock Instrumentation current clock value
+     * 
+     * @param eventName Name of the event that is committed (may correspond to
+     *                  action name in TLA+ for example)
+     * @param desc      Description of the commit (custom message)
+     * @param args      Arguments of the event that is committed (may correspond to
+     *                  action arguments in TLA+ for example)
+     * @param clock     Instrumentation current clock value
      * @throws IOException Thrown when unable to write event in trace file
      */
     private void logChanges(String eventName, Object[] args, String desc, long clock) throws IOException {
@@ -216,9 +252,12 @@ public class TLATracer {
 
     /**
      * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
-     * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
-     * @param desc Description of the commit (custom message)
+     * 
+     * @param eventName Name of the event that is committed (may correspond to
+     *                  action name in TLA+ for example)
+     * @param args      Arguments of the event that is committed (may correspond to
+     *                  action arguments in TLA+ for example)
+     * @param desc      Description of the commit (custom message)
      * @throws IOException Thrown when unable to write event in trace file
      */
     @Deprecated
@@ -229,8 +268,10 @@ public class TLATracer {
 
     /**
      * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
-     * @param desc Description of the commit (custom message)
+     * 
+     * @param eventName Name of the event that is committed (may correspond to
+     *                  action name in TLA+ for example)
+     * @param desc      Description of the commit (custom message)
      * @throws IOException Thrown when unable to write event in trace file
      */
     @Deprecated
@@ -240,8 +281,11 @@ public class TLATracer {
 
     /**
      * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond to action name in TLA+ for example)
-     * @param args Arguments of the event that is committed (may correspond to action arguments in TLA+ for example)
+     * 
+     * @param eventName Name of the event that is committed (may correspond to
+     *                  action name in TLA+ for example)
+     * @param args      Arguments of the event that is committed (may correspond to
+     *                  action arguments in TLA+ for example)
      * @throws IOException Thrown when unable to write event in trace file
      */
     @Deprecated
@@ -251,7 +295,9 @@ public class TLATracer {
 
     /**
      * Commit all variable changes in batch
-     * @param eventName Name of the event that is committed (may correspond with action name in TLA+ for example)
+     * 
+     * @param eventName Name of the event that is committed (may correspond with
+     *                  action name in TLA+ for example)
      * @throws IOException Thrown when unable to write event in trace file
      */
     @Deprecated
@@ -261,6 +307,7 @@ public class TLATracer {
 
     /**
      * Commit changes without specifying event name
+     * 
      * @throws IOException Thrown when unable to write event in trace file
      */
     @Deprecated
