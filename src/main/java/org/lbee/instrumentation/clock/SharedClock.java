@@ -76,6 +76,15 @@ public class SharedClock implements InstrumentationClock {
         return newValue;
     }
 
+    @Override
+    public synchronized long sync() {
+        final long value = getValue();
+        // final long newValue = Math.max(value, clock) + 1;
+        final long newValue = value + 1;
+        setValue(newValue);
+        return newValue;
+    }
+
     public String toString() {
         return Long.toString(getValue());
     }

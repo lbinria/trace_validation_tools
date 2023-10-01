@@ -148,7 +148,8 @@ public class TLATracer {
 
         // Commit all previously changed variables
         this.logChanges(eventName, args, desc, this.clock);
-        this.clock = this.globalClock.sync(this.clock);
+        // this.clock = this.globalClock.sync(this.clock);
+        this.clock = this.globalClock.sync();
     }
 
     /**

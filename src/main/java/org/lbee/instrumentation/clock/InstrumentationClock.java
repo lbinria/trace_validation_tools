@@ -4,9 +4,7 @@ public interface InstrumentationClock {
 
     long sync(long clock);
 
-    /**
-     * Get elapsed time of clock between now and the moment it was created
-     * @return Elapsed time in ms
-     */
-    // long getValue();
+    default long sync() {
+        return 0L;
+    }
 }
