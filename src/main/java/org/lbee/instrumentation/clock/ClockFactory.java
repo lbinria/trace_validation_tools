@@ -14,7 +14,7 @@ public class ClockFactory {
         }
     
     
-        public synchronized long sync(long clock) {
+        public synchronized long getNextTime(long clock) {
             this.value = Math.max(value, clock) + 1;
             return this.value;
         }

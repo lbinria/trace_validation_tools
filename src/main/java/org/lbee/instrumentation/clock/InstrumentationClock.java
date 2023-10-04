@@ -2,9 +2,9 @@ package org.lbee.instrumentation.clock;
 
 public interface InstrumentationClock {
 
-    long sync(long clock);
+    long getNextTime(long clock);
 
-    default long sync() {
+    default long getNextTime() {
         return 0L;
     }
 }

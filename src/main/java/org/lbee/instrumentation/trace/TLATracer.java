@@ -50,7 +50,7 @@ public class TLATracer {
         this.updates = new HashMap<>();
         // Set writer
         this.writer = writer;
-        this.clockValue = this.clock.sync(-1);
+        this.clockValue = this.clock.getNextTime(-1);
     }
 
     /**
@@ -173,7 +173,7 @@ public class TLATracer {
      */
     public void log(String eventName, Object[] args, long clockValue, String desc) throws IOException {
         // Update local clock
-        this.clockValue = this.clock.sync(clockValue);
+        this.clockValue = this.clock.getNextTime(clockValue);
         // Commit all previously changed variables
         this.logChanges(eventName, args, desc, this.clockValue);
     }

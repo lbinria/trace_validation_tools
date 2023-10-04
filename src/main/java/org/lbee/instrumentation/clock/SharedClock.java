@@ -12,7 +12,6 @@ import java.nio.file.StandardOpenOption;
  * Clock value is stored as a memory file map and can be accessed by different programs on the same hardware.
  */
 public class SharedClock implements InstrumentationClock {
-
     // Buffer for writing clock value
     private final LongBuffer buffer;
 
@@ -30,21 +29,10 @@ public class SharedClock implements InstrumentationClock {
     }
 
     /**
-     * Get a shared clock by its name
-     * @param name Name of shared clock you want
-     * @return A shared clock
-     * @throws IOException
-     */
-    public static SharedClock get(String name) throws IOException {
-        return new SharedClock(name);
-    }
-
-    /**
      * Get clock value
      * @return Clock value
      */
-    // @Override
-    public long getValue() {
+    private long getValue() {
         return buffer.get(0);
     }
 
@@ -57,19 +45,12 @@ public class SharedClock implements InstrumentationClock {
     }
 
     /**
-     * Reset shared clock (value=0)
-     */
-    public void reset() {
-        setValue(0);
-    }
-
-    /**
      * Synchronize clock with another value
      * @param clock Clock to synchronize with
      * @return Clock value
      */
     @Override
-    public synchronized long sync(long clock) {
+    public synchronized long getNextTime(long clock) {
         final long value = getValue();
         final long newValue = Math.max(value, clock) + 1;
         setValue(newValue);
@@ -77,16 +58,10 @@ public class SharedClock implements InstrumentationClock {
     }
 
     @Override
-    public synchronized long sync() {
-        final long value = getValue();
-        // final long newValue = Math.max(value, clock) + 1;
+    public synchronized long getNextTime() {
+        final long value = this.getValue();
         final long newValue = value + 1;
         setValue(newValue);
         return newValue;
     }
-
-    public String toString() {
-        return Long.toString(getValue());
-    }
-
 }
