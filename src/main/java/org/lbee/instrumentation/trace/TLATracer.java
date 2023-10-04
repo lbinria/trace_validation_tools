@@ -18,9 +18,9 @@ public class TLATracer {
     // Unique id
     private final String guid;
     // Local clock
-    private long clock;
+    private long clockValue;
     // Global clock
-    private final InstrumentationClock globalClock;
+    private final InstrumentationClock clock;
     // Writer that write event to file
     private final BufferedWriter writer;
     // Updates that happens on a variable (modifications batch)
@@ -43,14 +43,14 @@ public class TLATracer {
      */
     private TLATracer(BufferedWriter writer, InstrumentationClock clock) {
         // this.clock = -1;
-        this.globalClock = clock;
+        this.clock = clock;
         // Set unique id
         this.guid = UUID.randomUUID().toString();
         // Empty map of variable updates
         this.updates = new HashMap<>();
         // Set writer
         this.writer = writer;
-        this.clock = this.globalClock.sync(-1);
+        this.clockValue = this.clock.sync(-1);
     }
 
     /**
@@ -162,6 +162,25 @@ public class TLATracer {
     /**
      * Commit all variable changes in batch
      * 
+     * @param eventName  Name of the event that is committed (may correspond to
+     *                   action name in TLA+ for example)
+     * @param args       Arguments of the event that is committed (may correspond to
+     *                   action arguments in TLA+ for example)
+     * @param clockValue the current clockValue of the process at the moment the log
+     *                   is done
+     * @param desc       Description of the commit (custom message)
+     * @throws IOException Thrown when unable to write event in trace file
+     */
+    public void log(String eventName, Object[] args, long clockValue, String desc) throws IOException {
+        // Update local clock
+        this.clockValue = this.clock.sync(clockValue);
+        // Commit all previously changed variables
+        this.logChanges(eventName, args, desc, this.clockValue);
+    }
+
+    /**
+     * Commit all variable changes in batch
+     * 
      * @param eventName Name of the event that is committed (may correspond to
      *                  action name in TLA+ for example)
      * @param args      Arguments of the event that is committed (may correspond to
@@ -170,10 +189,7 @@ public class TLATracer {
      * @throws IOException Thrown when unable to write event in trace file
      */
     public void log(String eventName, Object[] args, String desc) throws IOException {
-        // Update local clock
-        this.clock = this.globalClock.sync(this.clock);
-        // Commit all previously changed variables
-        this.logChanges(eventName, args, desc, this.clock);
+        this.log(eventName, args, 0L, desc);
     }
 
     /**
