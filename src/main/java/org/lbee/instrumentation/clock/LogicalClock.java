@@ -1,6 +1,6 @@
 package org.lbee.instrumentation.clock;
 
-public class LogicalClock implements InstrumentationClock {
+class LogicalClock implements InstrumentationClock {
     // Current value of logical clock
     private long value;
 

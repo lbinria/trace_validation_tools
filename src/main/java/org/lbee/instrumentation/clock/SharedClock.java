@@ -11,7 +11,7 @@ import java.nio.file.StandardOpenOption;
  * A named clock that can be shared through multiple process.
  * Clock value is stored as a memory file map and can be accessed by different programs on the same hardware.
  */
-public class SharedClock implements InstrumentationClock {
+class SharedClock implements InstrumentationClock {
     // Buffer for writing clock value
     private final LongBuffer buffer;
 
