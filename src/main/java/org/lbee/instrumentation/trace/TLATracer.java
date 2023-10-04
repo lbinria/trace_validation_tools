@@ -108,98 +108,6 @@ public class TLATracer {
     }
 
     /**
-     * The value of the clock will be used when we close our transaction (endCommit)
-     * This method is useful to keep chronological order when logging some code like
-     * network message:
-     * If we use commitChanges AFTER the message send, it is possible that another
-     * process log something before
-     * that commitChanges is applied. It led to have a trace that log action of the
-     * process that receive message BEFORE the message is sent.
-     * Another way to deal with that is to call commitChanges BEFORE the message
-     * send but if the message send fail
-     * The trace remains correct at this point when it shouldn't be. However... in
-     * long term it's not really a problem because
-     * generally it will lead to an incorrect trace, that's why it's an experimental
-     * feature.
-     * 
-     * @throws IOException
-     */
-    public void startLog() throws IOException {
-        // this.clock = this.globalClock.sync(this.clock);
-    }
-
-    /**
-     * Commit all variable changes in batch
-     * 
-     * @param eventName Name of the event that is committed (may correspond to
-     *                  action name in TLA+ for example)
-     * @param args      Arguments of the event that is committed (may correspond to
-     *                  action arguments in TLA+ for example)
-     * @param desc      Description of the commit (custom message)
-     * @throws IOException Thrown when unable to write event in trace file
-     */
-    public void endLog(String eventName, Object[] args, String desc) throws IOException {
-        // if (this.clock < 0) {
-        // throw new IOException("No transactions have been opened.");
-        // }
-        // // Commit all previously changed variables
-        // this.logChanges(eventName, args, desc, this.clock);
-        // this.clock = -1;
-
-        // Commit all previously changed variables
-        this.logChanges(eventName, args, desc, this.clock);
-        // this.clock = this.globalClock.sync(this.clock);
-        this.clock = this.globalClock.sync();
-    }
-
-    /**
-     * Commit all variable changes in batch
-     * 
-     * @param eventName Name of the event that is committed (may correspond to
-     *                  action name in TLA+ for example)
-     * @param desc      Description of the commit (custom message)
-     * @throws IOException Thrown when unable to write event in trace file
-     */
-    public void endLog(String eventName, String desc) throws IOException {
-        this.endLog(eventName, new Object[] {}, desc);
-    }
-
-    /**
-     * Commit all variable changes in batch
-     * 
-     * @param eventName Name of the event that is committed (may correspond to
-     *                  action name in TLA+ for example)
-     * @param args      Arguments of the event that is committed (may correspond to
-     *                  action arguments in TLA+ for example)
-     * @throws IOException Thrown when unable to write event in trace file
-     */
-    public void endLog(String eventName, Object[] args) throws IOException {
-        this.endLog(eventName, args, "");
-    }
-
-    /**
-     * Commit all variable changes in batch
-     * 
-     * @param eventName Name of the event that is committed (may correspond to
-     *                  action name in TLA+ for example)
-     * @throws IOException Thrown when unable to write event in trace file
-     */
-    public void endLog(String eventName) throws IOException {
-        this.endLog(eventName, "");
-    }
-
-    /**
-     * Commit all variable changes in batch
-     * 
-     * @param eventName Name of the event that is committed (may correspond to
-     *                  action name in TLA+ for example)
-     * @throws IOException Thrown when unable to write event in trace file
-     */
-    public void endLog() throws IOException {
-        this.endLog("");
-    }
-
-    /**
      * Commit all variable changes in batch
      * 
      * @param eventName Name of the event that is committed (may correspond to
@@ -261,10 +169,11 @@ public class TLATracer {
      * @param desc      Description of the commit (custom message)
      * @throws IOException Thrown when unable to write event in trace file
      */
-    @Deprecated
     public void log(String eventName, Object[] args, String desc) throws IOException {
-        this.startLog();
-        this.endLog(eventName, args, desc);
+        // Update local clock
+        this.clock = this.globalClock.sync(this.clock);
+        // Commit all previously changed variables
+        this.logChanges(eventName, args, desc, this.clock);
     }
 
     /**
@@ -275,7 +184,6 @@ public class TLATracer {
      * @param desc      Description of the commit (custom message)
      * @throws IOException Thrown when unable to write event in trace file
      */
-    @Deprecated
     public void log(String eventName, String desc) throws IOException {
         this.log(eventName, new Object[] {}, desc);
     }
@@ -289,7 +197,6 @@ public class TLATracer {
      *                  action arguments in TLA+ for example)
      * @throws IOException Thrown when unable to write event in trace file
      */
-    @Deprecated
     public void log(String eventName, Object[] args) throws IOException {
         this.log(eventName, args, "");
     }
@@ -301,7 +208,6 @@ public class TLATracer {
      *                  action name in TLA+ for example)
      * @throws IOException Thrown when unable to write event in trace file
      */
-    @Deprecated
     public void log(String eventName) throws IOException {
         this.log(eventName, "");
     }
@@ -311,9 +217,7 @@ public class TLATracer {
      * 
      * @throws IOException Thrown when unable to write event in trace file
      */
-    @Deprecated
     public void log() throws IOException {
         this.log("");
     }
-
 }
