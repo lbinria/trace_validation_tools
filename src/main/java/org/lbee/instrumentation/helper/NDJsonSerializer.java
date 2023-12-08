@@ -1,4 +1,4 @@
-package org.lbee.instrumentation;
+package org.lbee.instrumentation.helper;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -6,13 +6,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-class NDJsonSerializer {
+public class NDJsonSerializer {
 
-    static JsonElement serializeValues(Object... values) {
+    static JsonElement serializeValues(Object... values) throws IllegalAccessException {
 
         final JsonArray jsonArgs = new JsonArray();
 
@@ -23,7 +24,7 @@ class NDJsonSerializer {
         return jsonArgs;
     }
 
-    static JsonElement serializeValue(Object propertyValue) {
+    static JsonElement serializeValue(Object propertyValue) throws IllegalAccessException {
         final JsonElement jsonValue;
 
         if (propertyValue == null)
@@ -49,12 +50,12 @@ class NDJsonSerializer {
         else if (propertyValue instanceof TLASerializer)
             jsonValue = ((TLASerializer) propertyValue).tlaSerialize();
         else
-            jsonValue = jsonObjectOf(propertyValue);
+            throw new IllegalAccessException("Unknown");
 
         return jsonValue;
     }
 
-    static JsonArray jsonArrayOf(List<?> list) {
+    public static JsonArray jsonArrayOf(List<?> list) throws IllegalAccessException {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : list) {
@@ -64,7 +65,7 @@ class NDJsonSerializer {
         return jsonArray;
     }
 
-    static JsonArray jsonArrayOf(HashSet<?> list) {
+    public static JsonArray jsonArrayOf(HashSet<?> list) throws IllegalAccessException {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : list) {
@@ -74,7 +75,7 @@ class NDJsonSerializer {
         return jsonArray;
     }
 
-    static JsonArray jsonArrayOf(Object[] array) {
+    public static JsonArray jsonArrayOf(Object[] array) throws IllegalAccessException {
         final JsonArray jsonArray = new JsonArray();
 
         for (Object e : array) {
@@ -84,9 +85,10 @@ class NDJsonSerializer {
         return jsonArray;
     }
 
-    static JsonObject jsonObjectOf(Object object) {
+    public static JsonObject jsonObjectOfMap(Map<?, ?> map) throws IllegalAccessException {
         final JsonObject jsonObject = new JsonObject();
 
+<<<<<<< HEAD:instrumentation/src/main/java/org/lbee/instrumentation/NDJsonSerializer.java
         for (Field field : object.getClass().getFields()) {
 
             if (!field.isAnnotationPresent(TraceField.class))
@@ -112,6 +114,8 @@ class NDJsonSerializer {
     static JsonObject jsonObjectOfMap(Map<?, ?> map) {
         final JsonObject jsonObject = new JsonObject();
 
+=======
+>>>>>>> 41a6ea63c796d113966f8c032e417ce0b4fbdf37:src/main/java/org/lbee/instrumentation/helper/NDJsonSerializer.java
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             jsonObject.add(entry.getKey().toString(), serializeValue(entry.getValue()));
         }

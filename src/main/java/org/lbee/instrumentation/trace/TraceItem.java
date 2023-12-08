@@ -1,10 +1,11 @@
-package org.lbee.instrumentation;
+package org.lbee.instrumentation.trace;
 
+import org.lbee.instrumentation.helper.NDJsonSerializer;
 import java.util.List;
 
 import com.google.gson.JsonObject;
 
-public class TraceItem {
+class TraceItem {
     private final String action;
     private List<String> path;
     private final List<Object> args;
@@ -15,7 +16,7 @@ public class TraceItem {
         this.args = args;
     }
 
-    public JsonObject jsonize() {
+    public JsonObject jsonize() throws IllegalAccessException {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("op", this.action);
         jsonObject.add("path", NDJsonSerializer.jsonArrayOf(path));
