@@ -85,37 +85,34 @@ public class NDJsonSerializer {
         return jsonArray;
     }
 
-    public static JsonObject jsonObjectOfMap(Map<?, ?> map) throws IllegalAccessException {
+    // public static JsonObject jsonObjectOfMap(Map<?, ?> map) throws IllegalAccessException {
+    //     final JsonObject jsonObject = new JsonObject();
+
+    //     for (Field field : object.getClass().getFields()) {
+
+    //         if (!field.isAnnotationPresent(TraceField.class))
+    //             continue;
+
+    //         final TraceField traceField = field.getAnnotation(TraceField.class);
+
+    //         try {
+    //             field.setAccessible(true);
+    //             final String fieldName = traceField.name() != null && !traceField.name().equals("") ? traceField.name() : field.getName();
+    //             final Object fieldValue = field.get(object);
+    //             jsonObject.add(fieldName, serializeValue(fieldValue));
+
+    //         } catch (Exception e) {
+    //             // Nothing
+    //             e.printStackTrace();
+    //         }
+    //     }
+
+    //     return jsonObject;
+    // }
+
+    static JsonObject jsonObjectOfMap(Map<?, ?> map) throws IllegalAccessException {
         final JsonObject jsonObject = new JsonObject();
 
-<<<<<<< HEAD:instrumentation/src/main/java/org/lbee/instrumentation/NDJsonSerializer.java
-        for (Field field : object.getClass().getFields()) {
-
-            if (!field.isAnnotationPresent(TraceField.class))
-                continue;
-
-            final TraceField traceField = field.getAnnotation(TraceField.class);
-
-            try {
-                field.setAccessible(true);
-                final String fieldName = traceField.name() != null && !traceField.name().equals("") ? traceField.name() : field.getName();
-                final Object fieldValue = field.get(object);
-                jsonObject.add(fieldName, serializeValue(fieldValue));
-
-            } catch (Exception e) {
-                // Nothing
-                e.printStackTrace();
-            }
-        }
-
-        return jsonObject;
-    }
-
-    static JsonObject jsonObjectOfMap(Map<?, ?> map) {
-        final JsonObject jsonObject = new JsonObject();
-
-=======
->>>>>>> 41a6ea63c796d113966f8c032e417ce0b4fbdf37:src/main/java/org/lbee/instrumentation/helper/NDJsonSerializer.java
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             jsonObject.add(entry.getKey().toString(), serializeValue(entry.getValue()));
         }
