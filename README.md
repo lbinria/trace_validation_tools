@@ -1,6 +1,6 @@
 # What is trace validation ?
 
-If you describe a system or a program with a formal specification, particularly a TLA+ formalism, you may have to your implementation against the specification. 
+If you describe a system or a program with a formal specification, particularly a TLA+ formalism, you may have to check your implementation against the specification. 
 
 To do that, you can use our `trace_validation_tools`. First, these
 tools provide primitives allowing one to log some selected events and
