@@ -114,3 +114,6 @@ modules.xml
 # old files
 instrumentation
 trace_validation_tools.egg-info
+
+#vscode
+.vscode/
