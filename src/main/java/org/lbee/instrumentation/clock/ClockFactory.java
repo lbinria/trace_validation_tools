@@ -1,22 +1,26 @@
 package org.lbee.instrumentation.clock;
 
-public class ClockFactory {
-    public static InstrumentationClock getClock(){
-        return new LogicalClock();
-    }
+import java.io.IOException;
 
-    private static class LogicalClock implements InstrumentationClock {
-        // Current value of logical clock
-        private long value;
-    
-        public LogicalClock() {
-            this.value = 0;
-        }
-    
-    
-        public synchronized long sync(long clock) {
-            this.value = Math.max(value, clock) + 1;
-            return this.value;
+import main.java.org.lbee.instrumentation.clock.ClockException;
+
+public class ClockFactory {
+    public final static int LOGICAL = 1;
+    public final static int LOCAL = 2;
+
+    public static InstrumentationClock getClock(int type, String... name) throws ClockException{
+        switch (type) {
+            case LOGICAL:
+                return new LogicalClock();
+            case LOCAL:
+                String cn = name.length == 1 ? name[0] : "default";
+                try {
+                    return new SharedClock(cn);
+                } catch (IOException exc) {
+                    throw new ClockException("Can't create clock: " + exc.getMessage());
+                }
+            default:
+                return new LogicalClock();
         }
     }
 }

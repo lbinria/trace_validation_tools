@@ -109,3 +109,8 @@ modules.xml
 
 # Sonarlint plugin
 .idea/sonarlint
+
+
+# old files
+instrumentation
+trace_validation_tools.egg-info
