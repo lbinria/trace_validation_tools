@@ -2,8 +2,6 @@ package org.lbee.instrumentation.clock;
 
 import java.io.IOException;
 
-import main.java.org.lbee.instrumentation.clock.ClockException;
-
 public class ClockFactory {
     public final static int LOGICAL = 1;
     public final static int LOCAL = 2;

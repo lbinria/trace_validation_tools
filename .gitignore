@@ -110,6 +110,8 @@ modules.xml
 # Sonarlint plugin
 .idea/sonarlint
 
+#vscode
+.vscode/
 
 # old files
 instrumentation

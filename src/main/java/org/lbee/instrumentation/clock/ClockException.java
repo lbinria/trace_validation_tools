@@ -1,4 +1,4 @@
-package main.java.org.lbee.instrumentation.clock;
+package org.lbee.instrumentation.clock;
 
 public class ClockException extends Exception {
     public ClockException(String message){

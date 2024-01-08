@@ -11,7 +11,7 @@ possible behavior w.r.t. the specification.
 
 # How to perform a trace validation ?
 
-- Writing the trace specification on top of your own spec (see part [useful tools](#useful-tools) and [templates](#templates) below)
+- Writing the trace specification on top of your own specification (see part [useful tools](#useful-tools) and [templates](#templates) below)
 - Use the primitives provided by the library to log events and variable changes in your system
 - Check the trace(s) produced by the system against the specification:
     * compile and execute the implementation (containing the tracing primitives)
@@ -22,7 +22,7 @@ possible behavior w.r.t. the specification.
 
 This repository contains:
 
-- An instrumentation library which can be used to trace events and state changes of a
+- An instrumentation library which can be used to trace events and state changes of an implementation
 - Scripts to manipulate and check trace files
 - Templates that aim to simplify the writing of trace specifications
 
@@ -35,10 +35,10 @@ This repository contains:
 
 ### Install TLA+ tools
 
-Create a directory and add the latest versions `tla2tools.jar` and
+Create a directory and add the latest versions of `tla2tools.jar` and
 `CommunityModules-deps.jar`. You do this either by installing the TLA+ toolbox
 from https://github.com/tlaplus/tlaplus/releases/tag/v1.8.0, section
-"Assets", or just the download the jars from
+"Assets", or just download the jars from
 https://github.com/tlaplus/tlaplus/releases/tag/v1.8.0
 and https://github.com/tlaplus/CommunityModules/releases.
 
@@ -54,7 +54,7 @@ get the package directly from the github maven registry.
 ## 1. Install package from sources
 
  - Clone the repository: `git clone https://github.com/lbinria/trace_validation_tools.git`
- - Package and install `mvn install`
+ - Package and install: `mvn install`
 
 ## 2. Install package from github maven registry
 
@@ -71,16 +71,17 @@ system you should trace add the following dependency:
     <dependency>
         <groupId>org.lbee</groupId>
         <artifactId>instrumentation</artifactId>
-        <version>1.1</version>
+        <version>1.3</version>
     </dependency>
 </dependencies>
 ```
+The version number depends on the version you intend to use. If installed from sources, the version is specified in the [pom.xml](pom.xml) file and a corresponding directory `org/lbee/instrumentation` is installed in the `.m2` `repository`.
 
 # Useful tools
 
 ## Scripts
 
-The Python script [scripts/trace_merger.py](scripts/trace_merger.py))
+The Python script [scripts/trace_merger.py](scripts/trace_merger.py)
 can be used to merge multiple trace files (from several concurrent
 processes) passed as parameter into a single one. For example, two
 trace files can be merged with
@@ -88,7 +89,7 @@ trace files can be merged with
 `python trace_merger.py trace_1.ndjson trace_2.ndjson --config system.ndjson.config --sort True`
 
 The Python script
-[scripts/tla_trace_validation.py](scripts/tla_trace_validation.py))
+[scripts/tla_trace_validation.py](scripts/tla_trace_validation.py)
 can be used to check using TLC a given trace w.r.t. a trace
 specification. For example,
 
