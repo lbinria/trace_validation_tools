@@ -42,7 +42,6 @@ public class TLATracer {
      * @param clock  The clock used when logging
      */
     private TLATracer(BufferedWriter writer, InstrumentationClock clock) {
-        // this.clock = -1;
         this.clock = clock;
         // Set unique id
         this.guid = UUID.randomUUID().toString();
@@ -50,7 +49,7 @@ public class TLATracer {
         this.updates = new HashMap<>();
         // Set writer
         this.writer = writer;
-        this.clockValue = this.clock.getNextTime(-1);
+        this.clockValue = this.clock.getNextTime();
     }
 
     /**
@@ -115,13 +114,13 @@ public class TLATracer {
      * @param desc      Description of the commit (custom message)
      * @param args      Arguments of the event that is committed (may correspond to
      *                  action arguments in TLA+ for example)
-     * @param clock     Instrumentation current clock value
+     * @param clockValue     Instrumentation current clock value
      * @throws IOException Thrown when unable to write event in trace file
      */
-    private void logChanges(String eventName, Object[] args, String desc, long clock) throws IOException {
+    private void logChanges(String eventName, Object[] args, String desc, long clockValue) throws IOException {
         final JsonObject jsonEvent = new JsonObject();
         // Set clock
-        jsonEvent.addProperty("clock", clock);
+        jsonEvent.addProperty("clock", clockValue);
         try {
             // add actions
             for (String variableName : this.updates.keySet()) {
