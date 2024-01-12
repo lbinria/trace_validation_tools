@@ -1,4 +1,4 @@
-package main.java.org.lbee.instrumentation.clock;
+package org.lbee.instrumentation.clock;
 
 /**
  * A local clock that simply does not modify the local time. It can be used when
