@@ -14,11 +14,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class TLATracer {
-
     // Unique id
     private final String guid;
-    // Local clock
-    private long clockValue;
     // Global clock
     private final InstrumentationClock clock;
     // Writer that write event to file
@@ -27,53 +24,47 @@ public class TLATracer {
     private final HashMap<String, List<TraceItem>> updates;
 
     /**
-     * Get instrumentation guid
+     * Get instrumentation guid.
      * 
-     * @return Unique id of instrumentation
+     * @return Unique id of instrumentation.
      */
     public String getGuid() {
         return guid;
     }
 
     /**
-     * Construct a new instrumentation
+     * Construct a new instrumentation.
      * 
-     * @param writer The buffer that write trace to an output stream
-     * @param clock  The clock used when logging
+     * @param writer The trace is written in this writer.
+     * @param clock  The clock used when logging.
      */
     private TLATracer(BufferedWriter writer, InstrumentationClock clock) {
         this.clock = clock;
+        this.writer = writer;
         // Set unique id
         this.guid = UUID.randomUUID().toString();
         // Empty map of variable updates
         this.updates = new HashMap<>();
-        // Set writer
-        this.writer = writer;
-        this.clockValue = this.clock.getNextTime();
     }
 
     /**
-     * Create new instrumentation
+     * Create a new instrumentation.
      * 
-     * @param tracePath Path of file where the trace will be recorded
-     * @param clock     Clock used for sync
-     * @return A new instrumentation or null if unable to create the trace file
+     * @param tracePath Path of file where the trace will be recorded.
+     * @param clock     The clock used when logging.
+     * @return A new instrumentation.
+     * @throws IOException Thrown when unable to create trace file.
      */
-    public static TLATracer getTracer(String tracePath, InstrumentationClock clock) {
-        try {
-            // Create the file
-            BufferedWriter writer = new BufferedWriter(new FileWriter(tracePath));
-            return new TLATracer(writer, clock);
-        } catch (IOException e) {
-            return null;
-        }
+    public static TLATracer getTracer(String tracePath, InstrumentationClock clock) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(tracePath));
+        return new TLATracer(writer, clock);
     }
 
     /**
-     * Notify the modification of the value of a variable
+     * Notify the modification of the value of a variable.
      * 
-     * @param variableName The name of the variable that is modified
-     * @param operator     Operator applied to the variable
+     * @param variableName Name of the variable that has been modified.
+     * @param operator     Operator applied to the variable to change its value.
      * @param path         Path of the variable that is modified (e.g: 'firstname'
      *                     for a record person)
      * @param args         Arguments used in operator
@@ -109,18 +100,18 @@ public class TLATracer {
     /**
      * Commit all variable changes in batch
      * 
-     * @param eventName Name of the event that is committed (may correspond to
-     *                  action name in TLA+ for example)
-     * @param desc      Description of the commit (custom message)
-     * @param args      Arguments of the event that is committed (may correspond to
-     *                  action arguments in TLA+ for example)
-     * @param clockValue     Instrumentation current clock value
+     * @param eventName  Name of the event that is committed (may correspond to
+     *                   action name in TLA+ for example)
+     * @param desc       Description of the commit (custom message)
+     * @param args       Arguments of the event that is committed (may correspond to
+     *                   action arguments in TLA+ for example)
+     * @param localClock Instrumentation current clock value
      * @throws IOException Thrown when unable to write event in trace file
      */
-    private void logChanges(String eventName, Object[] args, String desc, long clockValue) throws IOException {
+    private void logChanges(String eventName, Object[] args, String desc, long localClock) throws IOException {
         final JsonObject jsonEvent = new JsonObject();
         // Set clock
-        jsonEvent.addProperty("clock", clockValue);
+        jsonEvent.addProperty("clock", localClock);
         try {
             // add actions
             for (String variableName : this.updates.keySet()) {
@@ -165,16 +156,16 @@ public class TLATracer {
      *                   action name in TLA+ for example)
      * @param args       Arguments of the event that is committed (may correspond to
      *                   action arguments in TLA+ for example)
-     * @param clockValue the current clockValue of the process at the moment the log
+     * @param localClock the current clock value of the process at the moment the log
      *                   is done
      * @param desc       Description of the commit (custom message)
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void log(String eventName, Object[] args, long clockValue, String desc) throws IOException {
-        // Update local clock
-        this.clockValue = this.clock.getNextTime(clockValue);
+    public void log(String eventName, Object[] args, long localClock, String desc) throws IOException {
+        // Update global clock et get the next clock value
+        long clockValue = this.clock.getNextTime(localClock);
         // Commit all previously changed variables
-        this.logChanges(eventName, args, desc, this.clockValue);
+        this.logChanges(eventName, args, desc, clockValue);
     }
 
     /**
