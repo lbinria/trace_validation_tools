@@ -14,43 +14,41 @@ import java.util.List;
 import java.util.UUID;
 
 public class TLATracer {
-    // Unique id
+    // unique id
     private final String guid;
-    // Global clock
+    // clock providing the next time value
     private final InstrumentationClock clock;
-    // Writer that write event to file
+    // writer used to write the trace
     private final BufferedWriter writer;
-    // Updates that happens on a variable (modifications batch)
+    // for each logged variable store the modifications made since the last log
     private final HashMap<String, List<TraceItem>> updates;
 
     /**
-     * Get instrumentation guid.
+     * Get instrumentation unique id.
      * 
-     * @return Unique id of instrumentation.
+     * @return The unique id of the instrumentation.
      */
     public String getGuid() {
         return guid;
     }
 
     /**
-     * Construct a new instrumentation.
+     * Create a new instrumentation.
      * 
-     * @param writer The trace is written in this writer.
+     * @param writer The writer used to write the trace.
      * @param clock  The clock used when logging.
      */
     private TLATracer(BufferedWriter writer, InstrumentationClock clock) {
         this.clock = clock;
         this.writer = writer;
-        // Set unique id
         this.guid = UUID.randomUUID().toString();
-        // Empty map of variable updates
         this.updates = new HashMap<>();
     }
 
     /**
      * Create a new instrumentation.
      * 
-     * @param tracePath Path of file where the trace will be recorded.
+     * @param tracePath The path of the trace file.
      * @param clock     The clock used when logging.
      * @return A new instrumentation.
      * @throws IOException Thrown when unable to create trace file.
@@ -61,34 +59,41 @@ public class TLATracer {
     }
 
     /**
-     * Notify the modification of the value of a variable.
+     * Notify the modification of the value of a variable. The action performed on
+     * the variable (using an operator) is added to the list of actions performed
+     * since the last log.
      * 
-     * @param variableName Name of the variable that has been modified.
-     * @param operator     Operator applied to the variable to change its value.
-     * @param path         Path of the variable that is modified (e.g: 'firstname'
-     *                     for a record person)
-     * @param args         Arguments used in operator
+     * @param variable Name of the variable that has been modified.
+     * @param operator Operator applied to the variable to change its value.
+     *                 This should correspond to one of the operators defined in
+     *                 TVOperators.tla.
+     * @param path     Path of the field that is modified (e.g: ['address','city']
+     *                 for the residency city of a (record) person having a name, an
+     *                 addresss, etc.).
+     * @param args     Arguments used by the operator.
      */
-    public void notifyChange(String variableName, String operator, List<String> path, List<Object> args) {
-        if (!updates.containsKey(variableName)) {
-            updates.put(variableName, new ArrayList<>());
+    public void notifyChange(String variable, String operator, List<String> path, List<Object> args) {
+        // check if a modification has been already notified for the variable
+        if (!updates.containsKey(variable)) {
+            updates.put(variable, new ArrayList<>());
         }
-        // Add action to variable
-        updates.get(variableName).add(new TraceItem(operator, path, args));
+        // add the action to the list of actions
+        updates.get(variable).add(new TraceItem(operator, path, args));
     }
 
     /**
-     * Commit an exception catch from implementation
+     * Commit an exception caught in the implementation.
      * 
-     * @param desc Description of the exception
-     * @throws IOException Thrown when unable to write event in trace file
+     * @param desc Description of the exception.
+     * @throws IOException When unable to write event in trace file
      */
     public void logException(String desc) throws IOException {
         this.log("__exception", desc);
     }
 
     /**
-     * Get a virtual variable, that serve to notify change later
+     * Get a virtual variable, that is used to notify later changes of the
+     * corresponding concrete variable.
      * 
      * @param variableName Name of the variable
      * @return A virtual variable on which you can notify changes
@@ -156,7 +161,8 @@ public class TLATracer {
      *                   action name in TLA+ for example)
      * @param args       Arguments of the event that is committed (may correspond to
      *                   action arguments in TLA+ for example)
-     * @param localClock the current clock value of the process at the moment the log
+     * @param localClock the current clock value of the process at the moment the
+     *                   log
      *                   is done
      * @param desc       Description of the commit (custom message)
      * @throws IOException Thrown when unable to write event in trace file

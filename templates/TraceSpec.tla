@@ -17,24 +17,25 @@ MapVariables(logline) == Print(<<"Trace spec isn't valid, you should override 'M
 \*ASSUME TraceNext # Nil
 
 (* Read trace *)
-JsonTrace ==
+Trace ==
     IF "TRACE_PATH" \in DOMAIN IOEnv THEN
         ndJsonDeserialize(IOEnv.TRACE_PATH)
     ELSE
         Print(<<"Failed to validate the trace. TRACE_PATH environnement variable was expected.">>, "")
 
-(* Manage exceptions: assume that trace is free of any exception *)
-ASSUME \A t \in ToSet(JsonTrace) : "event" \notin DOMAIN t \/ ("event" \in DOMAIN t /\ t.event /= "__exception")
+(* Read config *)
+Config ==
+    IF "CONFIG_PATH" \in DOMAIN IOEnv THEN
+        ndJsonDeserialize(IOEnv.CONFIG_PATH)
+    ELSE
+        Print(<<"Failed to read the config. CONFIG_PATH environnement variable was expected.">>, "")
 
-(* Get trace skipping config line *)
-Trace ==
-    SubSeq(JsonTrace, 2, Len(JsonTrace))
+(* Manage exceptions: assume that trace is free of any exception *)
+ASSUME \A t \in ToSet(Trace) : "event" \notin DOMAIN t \/ ("event" \in DOMAIN t /\ t.event /= "__exception")
 
 logline ==
     Trace[l]
-
-
-
+    
 IsEvent(e) ==
     \* Equals FALSE if we get past the end of the log, causing model checking to stop.
     /\ l \in 1..Len(Trace)
