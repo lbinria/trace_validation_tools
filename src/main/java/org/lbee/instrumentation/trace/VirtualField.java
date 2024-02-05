@@ -58,12 +58,32 @@ public final class VirtualField {
         apply("Clear");
     }
 
-    public void init(Object val) {
-        apply("InitWithValue", val);
+    public void addToBag(Object val) {
+        apply("AddElementToBag", val);
+    }
+
+    public void removeFromBag(Object val) {
+        apply("RemoveElementFromBag", val);
+    }
+
+    public void clearBag() {
+        apply("ClearBag");
+    }
+
+    public void append(Object val) {
+        apply("AppendElement", val);
     }
 
     public void resetKey(Object key) {
         apply("ResetKey", key);
+    }
+
+    public void updateRecord(Object val) {
+        apply("UpdateRec", val);
+    }
+
+    public void initRecord() {
+        apply("InitRec");
     }
 
     public void apply(String op, Object... args) {

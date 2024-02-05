@@ -11,25 +11,29 @@ MapArgs(mapFunction, cur, default, op, args, eventName) == Print(<<"Trace spec i
 MapArgsBase(mapFunction, cur, default, op, args, eventName) == args
 
 (* Generic operators *)
-Replace(cur, val) == val
+Set(cur, val) == val
+
 AddElement(cur, val) == cur \cup {val}
 AddElements(cur, vals) == cur \cup ToSet(vals)
 RemoveElement(cur, val) == cur \ {val}
 Clear(cur, val) == {}
-AppendElement(cur, val) == Append(cur, val)
-RemoveKey(cur, val) == [k \in DOMAIN cur |-> IF k = val THEN Nil ELSE cur[k]]
-UpdateRec(cur, val) == [k \in DOMAIN cur |-> IF k \in DOMAIN val THEN val[k] ELSE cur[k]]
-AddToBag(cur, val) ==
+
+AddElementToBag(cur, val) ==
     IF val \in DOMAIN cur THEN
         [cur EXCEPT ![val] = cur[val] + 1]
     ELSE
         cur @@ (val :> 1)
-
-RemoveFromBag(cur, val) ==
+RemoveElementFromBag(cur, val) ==
     IF val \in DOMAIN cur THEN
         [cur EXCEPT ![val] = cur[val] - 1]
     ELSE
         cur
+ClearBag(cur, val) == <<>>
+
+AppendElement(cur, val) == Append(cur, val)
+
+ResetKey(cur, val) == [k \in DOMAIN cur |-> IF k = val THEN Nil ELSE cur[k]]
+UpdateRec(cur, val) == [k \in DOMAIN cur |-> IF k \in DOMAIN val THEN val[k] ELSE cur[k]]
 
 AddInteger(cur, val) == cur + val
 SubInteger(cur, val) == cur - val
@@ -37,30 +41,32 @@ SubInteger(cur, val) == cur - val
 Unchanged(cur, val) == cur
 
 
-Apply(var, default, op, args) ==
-    CASE op = "Replace" -> Replace(var, args[1])
+Apply(op, var, default, args) ==
+    CASE op = "Init" -> Set(var, default)
+    []   op = "Set" -> Set(var, args[1])
     []   op = "AddElement" -> AddElement(var, args[1])
     []   op = "AddElements" -> AddElements(var, args[1])
     []   op = "RemoveElement" -> RemoveElement(var, args[1])
-    []   op = "AddToBag" -> AddToBag(var, args[1])
-    []   op = "RemoveFromBag" -> RemoveFromBag(var, args[1])
+    []   op = "Clear" -> Clear(var, {})
+    []   op = "AddElementToBag" -> AddElementToBag(var, args[1])
+    []   op = "RemoveElementFromBag" -> RemoveElementFromBag(var, args[1])
+    []   op = "ClearBag" -> Clear(var, <<>>)
+    []   op = "AppendElement" -> AppendElement(var, args[1])
+    []   op = "ResetKey" -> ResetKey(var, args[1])
+    []   op = "UpdateRec" -> UpdateRec(var, args[1])
+    \* []   op = "InitWithValue" -> UpdateRec(default, args[1])
+    []   op = "InitRec" -> UpdateRec(var,default)
     []   op = "Add" -> AddInteger(var, args[1])
     []   op = "Sub" -> SubInteger(var, args[1])
-    []   op = "Clear" -> Clear(var, <<>>)
-    []   op = "AppendElement" -> AppendElement(var, args[1])
-    []   op = "RemoveKey" -> RemoveKey(var, args[1])
-    []   op = "UpdateRec" -> UpdateRec(var, args[1])
-    []   op = "Init" -> Replace(var, default)
-    []   op = "InitWithValue" -> UpdateRec(default, args[1])
     []   op = "Unchanged" -> Unchanged(var, args[1])
 
 RECURSIVE ExceptAtPath(_,_,_,_,_)
-LOCAL ExceptAtPath(var, default, path, op, args) ==
+LOCAL ExceptAtPath(op, var, default, path, args) ==
     LET h == Head(path) IN
     IF Len(path) > 1 THEN
-        [var EXCEPT ![h] = ExceptAtPath(var[h], default[h], Tail(path), op, args)]
+        [var EXCEPT ![h] = ExceptAtPath(op, var[h], default[h], Tail(path), args)]
     ELSE
-        [var EXCEPT ![h] = Apply(@, default[h], op, args)]
+        [var EXCEPT ![h] = Apply(op, @, default[h], args)]
 
 RECURSIVE ApplyUpdates(_,_,_,_)
 LOCAL ApplyUpdates(var, varName, updates, event) ==
@@ -68,15 +74,15 @@ LOCAL ApplyUpdates(var, varName, updates, event) ==
 
     LET applied ==
         IF Len(update.path) > 0 THEN
-            ExceptAtPath(var, Default(varName), update.path, update.op, update.args)
+            ExceptAtPath(update.op, var, Default(varName), update.path, update.args)
         ELSE
             LET mapArgs ==
                 IF "map" \in DOMAIN update THEN
-                    MapArgs(update.map, var, Default(varName), update.op, update.args, event)
+                    MapArgs(update.op, update.map, var, Default(varName), update.args, event)
                 ELSE
                     update.args
             IN
-            Apply(var, Default(varName), update.op, mapArgs)
+            Apply(update.op, var, Default(varName), mapArgs)
     IN
     IF Len(updates) > 1 THEN
         ApplyUpdates(applied, varName, Tail(updates), event)
