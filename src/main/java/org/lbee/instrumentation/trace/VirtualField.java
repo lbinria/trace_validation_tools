@@ -34,16 +34,20 @@ public final class VirtualField {
         return new VirtualField(name, this);
     }
 
-    public void set(Object val) {
-        apply("Replace", val);
+    public void init() {
+        apply("Init");
     }
 
-    public void addAll(Collection<?> vals) {
-        apply("AddElements", vals);
+    public void set(Object val) {
+        apply("Set", val);
     }
 
     public void add(Object val) {
         apply("AddElement", val);
+    }
+
+    public void addAll(Collection<?> vals) {
+        apply("AddElements", vals);
     }
 
     public void remove(Object val) {
@@ -54,16 +58,12 @@ public final class VirtualField {
         apply("Clear");
     }
 
-    public void init() {
-        apply("Init");
-    }
-
     public void init(Object val) {
         apply("InitWithValue", val);
     }
 
-    public void removeKey(Object key) {
-        apply("RemoveKey", key);
+    public void resetKey(Object key) {
+        apply("ResetKey", key);
     }
 
     public void apply(String op, Object... args) {
