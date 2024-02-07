@@ -69,7 +69,7 @@ public class TLATracer {
      *                 TVOperators.tla.
      * @param path     Path of the field that is modified (e.g: ['address','city']
      *                 for the residency city of a (record) person having a name, an
-     *                 addresss, etc.).
+     *                 address, etc.).
      * @param args     Arguments used by the operator.
      */
     public void notifyChange(String variable, String operator, List<String> path, List<Object> args) {
