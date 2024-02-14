@@ -165,13 +165,15 @@ public class TLATracer {
      *                   log
      *                   is done
      * @param desc       Description of the commit (custom message)
+     * @return the clock value used to log the event
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void log(String eventName, Object[] args, long localClock, String desc) throws IOException {
+    public long log(String eventName, Object[] args, long localClock, String desc) throws IOException {
         // Update global clock et get the next clock value
         long clockValue = this.clock.getNextTime(localClock);
         // Commit all previously changed variables
         this.logChanges(eventName, args, desc, clockValue);
+        return clockValue;
     }
 
     /**
@@ -182,10 +184,11 @@ public class TLATracer {
      * @param args      Arguments of the event that is committed (may correspond to
      *                  action arguments in TLA+ for example)
      * @param desc      Description of the commit (custom message)
+     * @return the clock value used to log the event
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void log(String eventName, Object[] args, String desc) throws IOException {
-        this.log(eventName, args, 0L, desc);
+    public long log(String eventName, Object[] args, String desc) throws IOException {
+        return this.log(eventName, args, 0L, desc);
     }
 
     /**
@@ -194,10 +197,11 @@ public class TLATracer {
      * @param eventName Name of the event that is committed (may correspond to
      *                  action name in TLA+ for example)
      * @param desc      Description of the commit (custom message)
+     * @return the clock value used to log the event
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void log(String eventName, String desc) throws IOException {
-        this.log(eventName, new Object[] {}, desc);
+    public long log(String eventName, String desc) throws IOException {
+        return this.log(eventName, new Object[] {}, desc);
     }
 
     /**
@@ -207,10 +211,11 @@ public class TLATracer {
      *                  action name in TLA+ for example)
      * @param args      Arguments of the event that is committed (may correspond to
      *                  action arguments in TLA+ for example)
+     * @return the clock value used to log the event
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void log(String eventName, Object[] args) throws IOException {
-        this.log(eventName, args, "");
+    public long log(String eventName, Object[] args) throws IOException {
+        return this.log(eventName, args, "");
     }
 
     /**
@@ -218,18 +223,20 @@ public class TLATracer {
      * 
      * @param eventName Name of the event that is committed (may correspond with
      *                  action name in TLA+ for example)
+     * @return the clock value used to log the event
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void log(String eventName) throws IOException {
-        this.log(eventName, "");
+    public long log(String eventName) throws IOException {
+        return this.log(eventName, "");
     }
 
     /**
      * Commit changes without specifying event name
      * 
+     * @return the clock value used to log the event
      * @throws IOException Thrown when unable to write event in trace file
      */
-    public void log() throws IOException {
-        this.log("");
+    public long log() throws IOException {
+        return this.log("");
     }
 }
