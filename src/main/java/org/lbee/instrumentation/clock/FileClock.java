@@ -60,7 +60,6 @@ class FileClock implements InstrumentationClock {
         final long value = this.getValue();
         final long newValue = Math.max(value, clock) + 1;
         this.setValue(newValue);
-        System.out.println("###### Clock value: " + newValue + "(was " + value + ")");
         return newValue;
     }
 }
