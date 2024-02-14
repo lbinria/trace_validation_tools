@@ -29,9 +29,8 @@ class FileClock implements InstrumentationClock {
                 StandardOpenOption.CREATE);
         final MappedByteBuffer b = channel.map(FileChannel.MapMode.READ_WRITE, 0, 8);
         buffer = b.asLongBuffer();
-        buffer.put(0, 0);
     }
-
+   
     /**
      * Get clock value
      * 
@@ -58,9 +57,10 @@ class FileClock implements InstrumentationClock {
      */
     @Override
     public synchronized long getNextTime(long clock) {
-        final long value = getValue();
+        final long value = this.getValue();
         final long newValue = Math.max(value, clock) + 1;
-        setValue(newValue);
+        this.setValue(newValue);
+        System.out.println("###### Clock value: " + newValue + "(was " + value + ")");
         return newValue;
     }
 }
