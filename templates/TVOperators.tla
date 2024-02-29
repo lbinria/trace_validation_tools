@@ -7,8 +7,8 @@ EXTENDS TLC, Sequences, SequencesExt, Naturals, FiniteSets, Bags, Json, IOUtils
 CONSTANT Nil
 (* Operators to override *)
 Default(varName) ==  Print(<<"Trace spec isn't valid, you should override 'Default' operator.">>, Nil)
-MapArgs(mapFunction, cur, default, op, args, eventName) == Print(<<"Trace spec isn't valid, you should override 'MapArgs' operator.">>, Nil)
-MapArgsBase(mapFunction, cur, default, op, args, eventName) == args
+MapArgs(mapFunction, cur, default, op, args) == Print(<<"Trace spec isn't valid, you should override 'MapArgs' operator.">>, Nil)
+MapArgsBase(mapFunction, cur, default, op, args) == args
 
 (* Generic operators *)
 Set(cur, val) == val
@@ -68,8 +68,8 @@ LOCAL ExceptAtPath(op, var, default, path, args) ==
     ELSE
         [var EXCEPT ![h] = Apply(op, @, default[h], args)]
 
-RECURSIVE ApplyUpdates(_,_,_,_)
-LOCAL ApplyUpdates(var, varName, updates, event) ==
+RECURSIVE ApplyUpdates(_,_,_)
+LOCAL ApplyUpdates(var, varName, updates) ==
     LET update == Head(updates) IN
 
     LET applied ==
@@ -78,18 +78,17 @@ LOCAL ApplyUpdates(var, varName, updates, event) ==
         ELSE
             LET mapArgs ==
                 IF "map" \in DOMAIN update THEN
-                    MapArgs(update.op, update.map, var, Default(varName), update.args, event)
+                    MapArgs(update.op, update.map, var, Default(varName), update.args)
                 ELSE
                     update.args
             IN
             Apply(update.op, var, Default(varName), mapArgs)
     IN
     IF Len(updates) > 1 THEN
-        ApplyUpdates(applied, varName, Tail(updates), event)
+        ApplyUpdates(applied, varName, Tail(updates))
     ELSE
         applied
 
 UpdateVariable(var, varName, logline) ==
-    LET event == IF "event" \in DOMAIN logline THEN logline.event ELSE "" IN
-    ApplyUpdates(var, varName, logline[varName], event)
+    ApplyUpdates(var, varName, logline[varName])
 ====
