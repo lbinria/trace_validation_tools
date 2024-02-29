@@ -89,7 +89,7 @@ LOCAL ApplyUpdates(var, varName, updates, event) ==
     ELSE
         applied
 
-MapVariable(var, varName, logline) ==
+UpdateVariable(var, varName, logline) ==
     LET event == IF "event" \in DOMAIN logline THEN logline.event ELSE "" IN
     ApplyUpdates(var, varName, logline[varName], event)
 ====

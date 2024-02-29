@@ -2,12 +2,15 @@ package org.lbee.instrumentation.trace;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import org.lbee.instrumentation.clock.ClockFactory;
 import org.lbee.instrumentation.clock.InstrumentationClock;
 import org.lbee.instrumentation.helper.NDJsonSerializer;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +59,19 @@ public class TLATracer {
     public static TLATracer getTracer(String tracePath, InstrumentationClock clock) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(tracePath));
         return new TLATracer(writer, clock);
+    }
+
+    /**
+     * Create a new instrumentation for the case where clock are handled locally by
+     * each process.
+     * 
+     * @param tracePath The path of the trace file.
+     * @return A new instrumentation.
+     * @throws IOException Thrown when unable to create trace file.
+     * @throws ClockException Thrown when unable to create clock (normally never thrown for a LOCAL clock).
+     */
+    public static TLATracer getTracer(String tracePath) throws IOException, ClockException {
+        return getTracer(tracePath, ClockFactory.getClock(ClockFactory.LOCAL));
     }
 
     /**

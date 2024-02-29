@@ -12,7 +12,7 @@ VARIABLES l
 Vars == Print(<<"Trace spec isn't valid, you should override 'Vars'.">>, <<>>)
 BaseInit == Print(<<"Trace spec isn't valid, you should override 'BaseInit'.">>, Nil)
 TraceNext == Print(<<"Trace spec isn't valid, you should override 'TraceNext'.">>, Nil)
-MapVariables(logline) == Print(<<"Trace spec isn't valid, you should override 'MapVariables'.">>, Nil)
+UpdateVariables(logline) == Print(<<"Trace spec isn't valid, you should override 'UpdateVariables'.">>, Nil)
 \*ASSUME Vars /= <<>>
 \*ASSUME TraceNext # Nil
 
@@ -41,7 +41,7 @@ IsEvent(e) ==
     /\ l \in 1..Len(Trace)
     /\ IF "event" \in DOMAIN logline THEN logline.event = e ELSE TRUE
     /\ l' = l + 1
-    /\ MapVariables(logline)
+    /\ UpdateVariables(logline)
 
 TraceInit ==
     /\ l = 1
