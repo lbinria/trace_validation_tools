@@ -90,7 +90,7 @@ public class TLATracer {
      *                 address, etc.).
      * @param args     Arguments used by the operator.
      */
-    public void notifyChange(String variable, String operator, List<String> path, List<Object> args) {
+    public synchronized void notifyChange(String variable, String operator, List<String> path, List<Object> args) {
         // check if a modification has been already notified for the variable
         if (!updates.containsKey(variable)) {
             updates.put(variable, new ArrayList<>());
