@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.lbee.instrumentation.clock.ClockFactory;
+import org.lbee.instrumentation.clock.ClockException;
 import org.lbee.instrumentation.clock.InstrumentationClock;
 import org.lbee.instrumentation.helper.NDJsonSerializer;
 
@@ -67,8 +68,9 @@ public class TLATracer {
      * 
      * @param tracePath The path of the trace file.
      * @return A new instrumentation.
-     * @throws IOException Thrown when unable to create trace file.
-     * @throws ClockException Thrown when unable to create clock (normally never thrown for a LOCAL clock).
+     * @throws IOException    Thrown when unable to create trace file.
+     * @throws ClockException Thrown when unable to create clock (normally never
+     *                        thrown for a LOCAL clock).
      */
     public static TLATracer getTracer(String tracePath) throws IOException, ClockException {
         return getTracer(tracePath, ClockFactory.getClock(ClockFactory.LOCAL));
@@ -129,7 +131,8 @@ public class TLATracer {
      * @param localClock Instrumentation current clock value
      * @throws IOException Thrown when unable to write event in trace file
      */
-    private void logChanges(String eventName, Object[] args, String desc, long localClock) throws IOException {
+    private synchronized void logChanges(String eventName, Object[] args, String desc, long localClock)
+            throws IOException {
         final JsonObject jsonEvent = new JsonObject();
         // Set clock
         jsonEvent.addProperty("clock", localClock);
@@ -137,7 +140,7 @@ public class TLATracer {
             // add actions
             for (String variableName : this.updates.keySet()) {
                 // Get actions made on the updated variable
-                final List<TraceItem> actions = this.updates.get(variableName);
+                final List<TraceItem> actions = new ArrayList<>(this.updates.get(variableName));
                 final JsonArray jsonActions = new JsonArray();
                 for (TraceItem action : actions) {
                     jsonActions.add(action.jsonize());

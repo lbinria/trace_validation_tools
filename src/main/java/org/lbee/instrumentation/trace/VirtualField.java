@@ -78,6 +78,10 @@ public final class VirtualField {
         apply("ResetKey", key);
     }
 
+    public void setKey(Object key, Object value) {
+        apply("SetKey", key, value);
+    }
+
     public void updateRecord(Object val) {
         apply("UpdateRec", val);
     }
