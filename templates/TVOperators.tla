@@ -33,6 +33,7 @@ ClearBag(cur, val) == <<>>
 AppendElement(cur, val) == Append(cur, val)
 
 ResetKey(cur, val) == [k \in DOMAIN cur |-> IF k = val THEN Nil ELSE cur[k]]
+SetKey(cur, val, new) == [k \in DOMAIN cur |-> IF k = val THEN new ELSE cur[k]]
 UpdateRec(cur, val) == [k \in DOMAIN cur |-> IF k \in DOMAIN val THEN val[k] ELSE cur[k]]
 
 AddInteger(cur, val) == cur + val
@@ -53,6 +54,7 @@ Apply(op, var, default, args) ==
     []   op = "ClearBag" -> Clear(var, <<>>)
     []   op = "AppendElement" -> AppendElement(var, args[1])
     []   op = "ResetKey" -> ResetKey(var, args[1])
+    []   op = "SetKey" -> SetKey(var, args[1],args[2])
     []   op = "UpdateRec" -> UpdateRec(var, args[1])
     \* []   op = "InitWithValue" -> UpdateRec(default, args[1])
     []   op = "InitRec" -> UpdateRec(var,default)

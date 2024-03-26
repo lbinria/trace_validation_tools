@@ -7,7 +7,6 @@ ASSUME TLCGet("config").mode = "bfs"
 
 VARIABLES l
 
-
 (* Operators to override *)
 Vars == Print(<<"Trace spec isn't valid, you should override 'Vars'.">>, <<>>)
 BaseInit == Print(<<"Trace spec isn't valid, you should override 'BaseInit'.">>, Nil)
@@ -21,14 +20,14 @@ Trace ==
     IF "TRACE_PATH" \in DOMAIN IOEnv THEN
         ndJsonDeserialize(IOEnv.TRACE_PATH)
     ELSE
-        Print(<<"Failed to validate the trace. TRACE_PATH environnement variable was expected.">>, "")
+        Print(<<"TRACE_PATH environnement variable not found, use default trace file.">>, ndJsonDeserialize("trace.ndjson"))
 
 (* Read config *)
 Config ==
     IF "CONFIG_PATH" \in DOMAIN IOEnv THEN
         ndJsonDeserialize(IOEnv.CONFIG_PATH)
     ELSE
-        Print(<<"Failed to read the config. CONFIG_PATH environnement variable was expected.">>, "")
+        Print(<<"CONFIG_PATH environnement variable not found, use default config file.">>, ndJsonDeserialize("conf.ndjson"))
 
 (* Manage exceptions: assume that trace is free of any exception *)
 ASSUME \A t \in ToSet(Trace) : "event" \notin DOMAIN t \/ ("event" \in DOMAIN t /\ t.event /= "__exception")
@@ -53,7 +52,7 @@ IsStuttering ==
 
 TraceSpec ==
     \* Because of  [A]_v <=> A \/ v=v'  , the following formula is logically
-     \* equivalent to the (canonical) Spec formual  Init /\ [][Next]_vars  .
+     \* equivalent to the (canonical) Spec formula Init /\ [][Next]_vars.
      \* However, TLC's breadth-first algorithm does not explore successor
      \* states of a *seen* state.  Since one or more states may appear one or
      \* more times in the the trace, the  UNCHANGED vars  combined with the
