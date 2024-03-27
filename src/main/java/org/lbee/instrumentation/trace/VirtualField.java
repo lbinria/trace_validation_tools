@@ -38,8 +38,8 @@ public final class VirtualField {
         apply("Init");
     }
 
-    public void set(Object val) {
-        apply("Set", val);
+    public void update(Object val) {
+        apply("Update", val);
     }
 
     public void add(Object val) {

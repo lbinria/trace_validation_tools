@@ -11,7 +11,7 @@ MapArgs(mapFunction, cur, default, op, args) == Print(<<"Trace spec isn't valid,
 MapArgsBase(mapFunction, cur, default, op, args) == args
 
 (* Generic operators *)
-Set(cur, val) == val
+Update(cur, val) == val
 
 AddElement(cur, val) == cur \cup {val}
 AddElements(cur, vals) == cur \cup ToSet(vals)
@@ -43,8 +43,8 @@ Unchanged(cur, val) == cur
 
 
 Apply(op, var, default, args) ==
-    CASE op = "Init" -> Set(var, default)
-    []   op = "Set" -> Set(var, args[1])
+    CASE op = "Init" -> Update(var, default)
+    []   op = "Update" -> Update(var, args[1])
     []   op = "AddElement" -> AddElement(var, args[1])
     []   op = "AddElements" -> AddElements(var, args[1])
     []   op = "RemoveElement" -> RemoveElement(var, args[1])
