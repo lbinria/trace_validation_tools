@@ -91,7 +91,7 @@ public final class VirtualField {
     }
 
     public void apply(String op, Object... args) {
-        behaviorRecorder.notifyChange(this.var, op, this.path, List.of(args));
+        behaviorRecorder.notifyChange(this.var, this.path, op, List.of(args));
     }
 
     private List<String> getPath() {
