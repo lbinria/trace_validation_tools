@@ -2,7 +2,7 @@
 
 If you describe a system or a program with a formal specification, particularly a TLA+ formalism, you may have to check your implementation against the specification. 
 
-To do that, you can use our `trace_validation_tools`. First, these
+To do that for Java proggrams, you can use our `trace_validation_tools`. First, these
 tools provide primitives allowing one to log some selected events and
 variables during the execution.  Then, thanks to a trace validation
 specification, that is a refinement of the formal specification of the
@@ -82,8 +82,13 @@ system you should trace add the following dependency:
 
 The Python script [scripts/trace_merger.py](scripts/trace_merger.py))
 can be used to merge multiple trace files (from several concurrent
-processes) passed as parameter into a single one. For example, two
-trace files can be merged with
+processes) passed as parameter into a single one. Arguments:
+- `files`: Trace files to merge (or directories containg `ndjson` files to be merged)
+- `--config`: Config file (default=`conf.ndjson`)
+- `--sort`: Sort by clock (default=`True`)
+- `--remove_meta` Remove clock and sender data (default=`True`)
+- `--out` Output file (default=`trace.ndjson`)
+For example, two trace files can be merged with
 
 `python trace_merger.py trace_1.ndjson trace_2.ndjson --config system.ndjson.config --sort True`
 
