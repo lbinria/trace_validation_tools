@@ -8,28 +8,32 @@ import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 
 /**
- * A named clock that can be shared through multiple process.
- * Clock value is stored as a memory file map and can be accessed by different programs on the same hardware.
+ * A named clock that can be shared through multiple processes. Clock value is
+ * stored as a memory file map and can be accessed by different processes on the
+ * same hardware.
  */
-class SharedClock implements InstrumentationClock {
-    // Buffer for writing clock value
+class FileClock implements InstrumentationClock {
+    // Buffer storing the clock value
     private final LongBuffer buffer;
 
     /**
      * Build a shared clock given a name
+     * 
      * @param name Unique name of the shared clock
      * @throws IOException
      */
-    public SharedClock(String name) throws IOException {
+    public FileClock(String name) throws IOException {
         // Create memory mapped file
         final File f = new File(name);
-        final FileChannel channel = FileChannel.open(f.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+        final FileChannel channel = FileChannel.open(f.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE);
         final MappedByteBuffer b = channel.map(FileChannel.MapMode.READ_WRITE, 0, 8);
         buffer = b.asLongBuffer();
     }
-
+   
     /**
      * Get clock value
+     * 
      * @return Clock value
      */
     private long getValue() {
@@ -38,6 +42,7 @@ class SharedClock implements InstrumentationClock {
 
     /**
      * Set clock value
+     * 
      * @param value Value
      */
     private void setValue(long value) {
@@ -46,22 +51,15 @@ class SharedClock implements InstrumentationClock {
 
     /**
      * Synchronize clock with another value
-     * @param clock Clock to synchronize with
-     * @return Clock value
+     * 
+     * @param clock clock to synchronize with
+     * @return clock value
      */
     @Override
     public synchronized long getNextTime(long clock) {
-        final long value = getValue();
-        final long newValue = Math.max(value, clock) + 1;
-        setValue(newValue);
-        return newValue;
-    }
-
-    @Override
-    public synchronized long getNextTime() {
         final long value = this.getValue();
-        final long newValue = value + 1;
-        setValue(newValue);
+        final long newValue = Math.max(value, clock) + 1;
+        this.setValue(newValue);
         return newValue;
     }
 }

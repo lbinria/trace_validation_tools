@@ -1,10 +1,14 @@
 package org.lbee.instrumentation.clock;
 
-class LogicalClock implements InstrumentationClock {
+/**
+ * A memory clock that can be shared through multiple threads of the same
+ * process.
+ */
+class MemoryClock implements InstrumentationClock {
     // Current value of logical clock
     private long value;
 
-    public LogicalClock() {
+    public MemoryClock() {
         this.value = 0;
     }
 
