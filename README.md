@@ -2,7 +2,7 @@
 
 If you describe a system or a program with a formal specification, particularly a TLA+ formalism, you may have to check your implementation against the specification. 
 
-To do that for Java proggrams, you can use our `trace_validation_tools`. First, these
+To do that for Java programs, you can use our `trace_validation_tools`. First, these
 tools provide primitives allowing one to log some selected events and
 variables during the execution.  Then, thanks to a trace validation
 specification, that is a refinement of the formal specification of the
@@ -88,9 +88,16 @@ processes) passed as parameter into a single one. Arguments:
 - `--sort`: Sort by clock (default=`True`)
 - `--remove_meta` Remove clock and sender data (default=`True`)
 - `--out` Output file (default=`trace.ndjson`)
+
 For example, two trace files can be merged with
 
 `python trace_merger.py trace_1.ndjson trace_2.ndjson --config system.ndjson.config --sort True`
+
+One can simply use
+
+`python trace_merger.py`
+
+to merge all `ndjson` files in the current directory into `trace.ndjson`.
 
 The Python script
 [scripts/tla_trace_validation.py](scripts/tla_trace_validation.py))
