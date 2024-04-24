@@ -40,7 +40,7 @@ if __name__ == "__main__":
     parser.add_argument('spec', type=str, help="Specification file")
     parser.add_argument('--trace', type=str, required=False, default="trace.ndjson", help="Trace file")
     parser.add_argument('--config', type=str, required=False, default="conf.ndjson", help="Config file")
-    parser.add_argument('-dfs', '--dfs', type=bool, action=argparse.BooleanOptionalAction)
+    parser.add_argument('-dfs', '--dfs', type=bool, action=argparse.BooleanOptionalAction, help="breadth-first search")
     args = parser.parse_args()
     # Run
     run_tla(args.spec,args.trace,args.config,args.dfs)

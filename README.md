@@ -83,12 +83,14 @@ The version number depends on the version you intend to use. If installed from s
 
 The Python script [scripts/trace_merger.py](scripts/trace_merger.py)
 can be used to merge multiple trace files (from several concurrent
-processes) passed as parameter into a single one. Arguments:
+processes) passed as parameter into a single one. 
+
+Arguments:
 - `files`: Trace files to merge (or directories containg `ndjson` files to be merged)
 - `--config`: Config file (default=`conf.ndjson`)
 - `--sort`: Sort by clock (default=`True`)
-- `--remove_meta` Remove clock and sender data (default=`True`)
-- `--out` Output file (default=`trace.ndjson`)
+- `--remove_meta`: Remove clock and sender data (default=`True`)
+- `--out`: Output file (default=`trace.ndjson`)
 
 For example, two trace files can be merged with
 
@@ -103,14 +105,22 @@ to merge all `ndjson` files in the current directory into `trace.ndjson`.
 The Python script
 [scripts/tla_trace_validation.py](scripts/tla_trace_validation.py)
 can be used to check using TLC a given trace w.r.t. a trace
-specification. For example,
+specification. 
+
+Arguments:
+- `spec`: Specification file
+- `--config`: Config file (default=`conf.ndjson`)
+- `--trace`: Trace file (default=`trace.ndjson`)
+- `-bfs`: use breadth-first search (if not specified depth-first search is used)
+- `--remove_meta` Remove clock and sender data (default=`True`)
+
+For example,
 
 `python tla_trace_validation.py myTraceSpec.tla --trace trace.ndjson`
 
 ## Templates
 
-[Templates](templates) in are generic `tla` files that can be adapted according to a
-base specification. 
+[Templates](templates) in are generic `tla` files that can be adapted according to a base specification. 
 
 # Tutorial
 
