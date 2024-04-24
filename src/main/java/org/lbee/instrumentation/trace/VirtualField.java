@@ -34,16 +34,20 @@ public final class VirtualField {
         return new VirtualField(name, this);
     }
 
-    public void set(Object val) {
-        apply("Replace", val);
+    public void init() {
+        apply("Init");
     }
 
-    public void addAll(Collection<?> vals) {
-        apply("AddElements", vals);
+    public void update(Object val) {
+        apply("Update", val);
     }
 
     public void add(Object val) {
         apply("AddElement", val);
+    }
+
+    public void addAll(Collection<?> vals) {
+        apply("AddElements", vals);
     }
 
     public void remove(Object val) {
@@ -54,20 +58,40 @@ public final class VirtualField {
         apply("Clear");
     }
 
-    public void init() {
-        apply("Init");
+    public void addToBag(Object val) {
+        apply("AddElementToBag", val);
     }
 
-    public void init(Object val) {
-        apply("InitWithValue", val);
+    public void removeFromBag(Object val) {
+        apply("RemoveElementFromBag", val);
     }
 
-    public void removeKey(Object key) {
-        apply("RemoveKey", key);
+    public void clearBag() {
+        apply("ClearBag");
+    }
+
+    public void append(Object val) {
+        apply("AppendElement", val);
+    }
+
+    public void resetKey(Object key) {
+        apply("ResetKey", key);
+    }
+
+    public void setKey(Object key, Object value) {
+        apply("SetKey", key, value);
+    }
+
+    public void updateRecord(Object val) {
+        apply("UpdateRec", val);
+    }
+
+    public void initRecord() {
+        apply("InitRec");
     }
 
     public void apply(String op, Object... args) {
-        behaviorRecorder.notifyChange(this.var, op, this.path, List.of(args));
+        behaviorRecorder.notifyChange(this.var, this.path, op, List.of(args));
     }
 
     private List<String> getPath() {

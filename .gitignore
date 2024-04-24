@@ -25,10 +25,6 @@ hs_err_pid*
 ### Java Flight Recorder ###
 *.jfr
 
-### TLA ###
-states/
-*.bin
-
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -110,10 +106,9 @@ modules.xml
 # Sonarlint plugin
 .idea/sonarlint
 
-
-# old files
-instrumentation
-trace_validation_tools.egg-info
+### TLA ###
+states/
+*.bin
 
 #vscode
 .vscode/

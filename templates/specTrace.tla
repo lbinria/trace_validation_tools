@@ -34,14 +34,14 @@ DefaultImpl(varName) ==
 
 (* REPLACE / MODIFY COMMENT BELOW *)
 (*
-MapVariablesImpl(t) ==
+UpdateVariablesImpl(t) ==
     /\
         IF "var1" \in DOMAIN t
-        THEN var1' = MapVariable(var1, "var1", t)
+        THEN var1' = UpdateVariable(var1, "var1", t)
         ELSE TRUE
     /\
         IF "var2" \in DOMAIN t
-        THEN var2' = MapVariable(var2, "var2", t)
+        THEN var2' = UpdateVariable(var2, "var2", t)
         ELSE TRUE
     ...
 *)
