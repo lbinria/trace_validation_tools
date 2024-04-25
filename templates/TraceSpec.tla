@@ -72,4 +72,9 @@ TraceView ==
      \* consider  s_i  and s_j  , where  i  and  j  are the positions of  s  in the trace,
      \* to be different states.
     <<Vars, TLCGet("level")>>
+
+Termination ==
+    \* -Dtlc2.tool.queue.IStateQueue=StateDeque
+    l = Len(Trace) + 1  => TLCSet("exit", TRUE)
+
 ====
