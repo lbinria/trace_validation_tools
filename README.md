@@ -111,8 +111,7 @@ Arguments:
 - `spec`: Specification file
 - `--config`: Config file (default=`conf.ndjson`)
 - `--trace`: Trace file (default=`trace.ndjson`)
-- `-bfs`: use breadth-first search (if not specified depth-first search is used)
-- `--remove_meta` Remove clock and sender data (default=`True`)
+- `--dfs`: use depth-first search (if not specified breadth-first search is used)
 
 For example,
 
