@@ -8,26 +8,42 @@ public final class VirtualField {
 
     private final String name;
     private final VirtualField parentField;
-    private final TLATracer behaviorRecorder;
-    private final String var;
-    private final List<String> path;
+    private final TLATracer tracer;
+    // private final String var;
+    // private final List<String> path;
 
     public VirtualField(String name, VirtualField parentField) {
         this.name = name;
         this.parentField = parentField;
-        this.behaviorRecorder = parentField.behaviorRecorder;
-        List<String> fullPath = this.getPath();
-        this.var = fullPath.get(0);
-        this.path = fullPath.subList(1, fullPath.size());
+        this.tracer = parentField.tracer;
     }
 
-    public VirtualField(String name, TLATracer behaviorRecorder) {
+    public VirtualField(String name, TLATracer tracer) {
         this.name = name;
         this.parentField = null;
-        this.behaviorRecorder = behaviorRecorder;
-        List<String> fullPath = this.getPath();
-        this.var = fullPath.get(0);
-        this.path = fullPath.subList(1, fullPath.size());
+        this.tracer = tracer;
+    }
+
+    private String getVar() {
+        if (parentField == null) {
+            return name;
+        }
+        return parentField.getVar();
+    }
+
+    private List<String> getFullPath() {
+        List<String> path = new ArrayList<>();
+        if (parentField != null) {
+            path = parentField.getFullPath();
+        } 
+        path.add(name);
+        return path;
+    }
+
+    private List<String> getPath() {
+        List<String> fullPath = this.getFullPath();
+        List<String> path = fullPath.subList(1, fullPath.size());
+        return path;
     }
 
     public VirtualField getField(String name) {
@@ -91,20 +107,7 @@ public final class VirtualField {
     }
 
     public void apply(String op, Object... args) {
-        behaviorRecorder.notifyChange(this.var, this.path, op, List.of(args));
-    }
-
-    private List<String> getPath() {
-        final List<String> path;
-
-        if (parentField == null) {
-            path = new ArrayList<>();
-        } else {
-            path = parentField.getPath();
-        }
-
-        path.add(name);
-        return path;
+        tracer.notifyChange(this.getVar(), this.getPath(), op, List.of(args));
     }
 
     @Override
@@ -112,7 +115,7 @@ public final class VirtualField {
         return "VirtualField{" +
                 "name='" + name + '\'' +
                 ", parentField=" + parentField +
-                ", traceInstrumentation=" + behaviorRecorder +
+                ", traceInstrumentation=" + tracer +
                 '}';
     }
 }
