@@ -7,10 +7,10 @@ import com.google.gson.JsonObject;
 
 class TraceItem {
     private final String action;
-    private List<String> path;
+    private List<Object> path;
     private final List<Object> args;
 
-    public TraceItem(String action, List<String> path, List<Object> args) {
+    public TraceItem(String action, List<Object> path, List<Object> args) {
         this.action = action;
         this.path = path;
         this.args = args;

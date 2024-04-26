@@ -11,7 +11,6 @@ import org.lbee.instrumentation.helper.NDJsonSerializer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +89,7 @@ public class TLATracer {
      *                 address, etc.).
      * @param args     Arguments used by the operator.
      */
-    public synchronized void notifyChange(String variable,  List<String> path, String operator, List<Object> args) {
+    public synchronized void notifyChange(String variable,  List<Object> path, String operator, List<Object> args) {
         // check if a modification has been already notified for the variable
         if (!updates.containsKey(variable)) {
             updates.put(variable, new ArrayList<>());

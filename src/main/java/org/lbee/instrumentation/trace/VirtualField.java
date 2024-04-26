@@ -6,48 +6,66 @@ import java.util.List;
 
 public final class VirtualField {
 
-    private final String name;
+    private final PathItem item;
     private final VirtualField parentField;
     private final TLATracer tracer;
-    // private final String var;
-    // private final List<String> path;
-
-    public VirtualField(String name, VirtualField parentField) {
-        this.name = name;
-        this.parentField = parentField;
-        this.tracer = parentField.tracer;
-    }
 
     public VirtualField(String name, TLATracer tracer) {
-        this.name = name;
+        this.item = new PathItem(name, null, null);
         this.parentField = null;
         this.tracer = tracer;
     }
 
+    private VirtualField(String name, Integer index, Boolean bindex, VirtualField parentField) {
+        this.item = new PathItem(name, index, bindex);
+        this.parentField = parentField;
+        this.tracer = parentField.tracer;
+    }
+
+    public VirtualField getField(String name) {
+        return new VirtualField(name, null, null, this);
+    }
+
+    public VirtualField getField(int index) {
+        return new VirtualField(null, index, null, this);
+    }
+
+    public VirtualField getField(boolean bindex) {
+        return new VirtualField(null, null, bindex, this);
+    }
+
     private String getVar() {
         if (parentField == null) {
-            return name;
+            return this.item.name();
         }
         return parentField.getVar();
     }
 
-    private List<String> getFullPath() {
-        List<String> path = new ArrayList<>();
+    private List<Object> getFullPath() {
+        List<Object> path = new ArrayList<>();
         if (parentField != null) {
             path = parentField.getFullPath();
         } 
-        path.add(name);
+        if(item.name() != null) {
+            path.add(item.name());
+        } else if (item.index() != null) {
+            path.add(item.index());
+        } else if (item.bindex() != null) {
+            path.add(item.bindex());
+        } else { // should never happen
+            path.add(null);
+        }
         return path;
     }
 
-    private List<String> getPath() {
-        List<String> fullPath = this.getFullPath();
-        List<String> path = fullPath.subList(1, fullPath.size());
+    private List<Object> getPath() {
+        List<Object> fullPath = this.getFullPath();
+        List<Object> path = fullPath.subList(1, fullPath.size());
         return path;
     }
 
-    public VirtualField getField(String name) {
-        return new VirtualField(name, this);
+    public void apply(String op, Object... args) {
+        tracer.notifyChange(this.getVar(), this.getPath(), op, List.of(args));
     }
 
     public void init() {
@@ -104,18 +122,5 @@ public final class VirtualField {
 
     public void initRecord() {
         apply("InitRec");
-    }
-
-    public void apply(String op, Object... args) {
-        tracer.notifyChange(this.getVar(), this.getPath(), op, List.of(args));
-    }
-
-    @Override
-    public String toString() {
-        return "VirtualField{" +
-                "name='" + name + '\'' +
-                ", parentField=" + parentField +
-                ", traceInstrumentation=" + tracer +
-                '}';
     }
 }
