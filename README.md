@@ -11,18 +11,18 @@ possible behavior w.r.t. the specification.
 
 # How to perform a trace validation ?
 
-- Writing the trace specification on top of your own specification (see part [useful tools](#useful-tools) and [templates](#templates) below)
+- Writing the trace specification on top of your own specification (see Section [templates](#templates))
 - Use the primitives provided by the library to log events and variable changes in your system
 - Check the trace(s) produced by the system against the specification:
     * compile and execute the implementation (containing the tracing primitives)
-    * merge the produced trace files (see [useful tools](#useful-tools) and [scripts/trace_merger.py](scripts/trace_merger.py))
-    * execute TLC on the trace specification and the generated trace files (see [useful tools](#useful-tools) and [scripts/tla_trace_validation.py](scripts/tla_trace_validation.py))
+    * merge the produced trace files (see [scripts/trace_merger.py](scripts/trace_merger.py))
+    * execute TLC on the trace specification and the generated trace files ([scripts/tla_trace_validation.py](scripts/tla_trace_validation.py))
 
 # About this repository
 
 This repository contains:
 
-- An instrumentation library which can be used to trace events and state changes of an implementation
+- A Java instrumentation library which can be used to trace events and state changes of a Java implementation
 - Scripts to manipulate and check trace files
 - Templates that aim to simplify the writing of trace specifications
 
@@ -43,29 +43,22 @@ https://github.com/tlaplus/tlaplus/releases/tag/v1.8.0
 and https://github.com/tlaplus/CommunityModules/releases.
 
 The `tla_dir` variable in the script `tla_trace_validation.py` (see
-[useful tools](#useful-tools)) should be set to the value of your toolbox path.
+[scripts](#scripts)) should be set to the value of your toolbox path.
 
 # Install trace validation instrumentation
 
 There are two ways to use the instrumentation library in your
-projects. Either get the source, compile, package and install it, or
-get the package directly from the github maven registry.
-
-## 1. Install package from sources
-
+projects:
+1. Get the source, compile, package and install it:
  - Clone the repository: `git clone https://github.com/lbinria/trace_validation_tools.git`
  - Package and install: `mvn install`
+2. Get the jar directly from the assets in the [Releases](releases) section.
 
-## 2. Install package from github maven registry
+# Use the library 
 
-Add the file [scripts/settings.xml](scripts/settings.xml) to your
-`.m2` directory.
+If you use `maven` to build your project then, depending on the installation method, in the `pom.xml` file of the system you should add the corrsesponding dependencies.
 
-# How to use it 
-
-Independently of the installation method, in the `pom.xml` file of the
-system you should trace add the following dependency:
-
+1. If the library was built and installed locally:
 ```xml 
 <dependencies>
     <dependency>
@@ -77,9 +70,26 @@ system you should trace add the following dependency:
 ```
 The version number depends on the version you intend to use. If installed from sources, the version is specified in the [pom.xml](pom.xml) file and a corresponding directory `org/lbee/instrumentation` is installed in the `.m2` `repository`.
 
-# Useful tools
+2. If the jar is coppied locally to location `${jar.repository}`:
+```xml 
+<dependencies>
+        <dependency>
+            <groupId>org.lbee</groupId>
+            <artifactId>instrumentation</artifactId>
+            <version>1.3</version>
+            <scope>system</scope>
+            <systemPath>${jar.repository}/instrumentation-1.3.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+</dependencies>
+```
+The jar should be also specified in the classpath when executing the program.
 
-## Scripts
+# Scripts
 
 The Python script [scripts/trace_merger.py](scripts/trace_merger.py)
 can be used to merge multiple trace files (from several concurrent
@@ -117,11 +127,10 @@ For example,
 
 `python tla_trace_validation.py myTraceSpec.tla --trace trace.ndjson`
 
-## Templates
+# Templates
 
-[Templates](templates) in are generic `tla` files that can be adapted according to a base specification. 
+In [Templates](templates) you can find generic `tla` files that can be adapted according to a base specification. 
 
-# Tutorial
+# Examples
 
-You can find a simple example of using the library, the scripts and the
-templates at https://github.com/lbinria/TicTac.
+[TicTac](https://github.com/lbinria/TicTac) proposes several very simple examples of using the library, the scripts and the templates.
