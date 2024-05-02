@@ -27,15 +27,6 @@ public class TLATracer {
     private final HashMap<String, List<TraceItem>> updates;
 
     /**
-     * Get instrumentation unique id.
-     * 
-     * @return The unique id of the instrumentation.
-     */
-    public String getGuid() {
-        return guid;
-    }
-
-    /**
      * Create a new instrumentation.
      * 
      * @param writer The writer used to write the trace.
@@ -49,7 +40,7 @@ public class TLATracer {
     }
 
     /**
-     * Create a new instrumentation.
+     * Create a new tracer with a specified clock.
      * 
      * @param tracePath The path of the trace file.
      * @param clock     The clock used when logging.
@@ -62,8 +53,8 @@ public class TLATracer {
     }
 
     /**
-     * Create a new instrumentation for the case where clock are handled locally by
-     * each process.
+     * Create a new instrumentation for the case where the clock is handled locally
+     * by each process.
      * 
      * @param tracePath The path of the trace file.
      * @return A new instrumentation.
@@ -84,12 +75,13 @@ public class TLATracer {
      * @param operator Operator applied to the variable to change its value.
      *                 This should correspond to one of the operators defined in
      *                 TVOperators.tla.
-     * @param path     Path of the field that is modified (e.g: ['address','city']
-     *                 for the residency city of a (record) person having a name, an
-     *                 address, etc.).
+     * @param path     Path for the field of the variable which is modified (for
+     *                 example, ['address','city'] if the variable represents a
+     *                 person having a field address (and possibly other fields),
+     *                 and the address has a field city (and possibly other fields).
      * @param args     Arguments used by the operator.
      */
-    public synchronized void notifyChange(String variable,  List<Object> path, String operator, List<Object> args) {
+    public synchronized void notifyChange(String variable, List<Object> path, String operator, List<Object> args) {
         // check if a modification has been already notified for the variable
         if (!updates.containsKey(variable)) {
             updates.put(variable, new ArrayList<>());
@@ -164,7 +156,7 @@ public class TLATracer {
             desc = e.toString();
         }
         // Set sender
-        jsonEvent.addProperty("sender", this.getGuid());
+        jsonEvent.addProperty("sender", this.guid);
         // Commit to file
         writer.write(jsonEvent + "\n");
         writer.flush();
