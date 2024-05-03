@@ -5,8 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InaccessibleObjectException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -84,31 +82,6 @@ public class NDJsonSerializer {
 
         return jsonArray;
     }
-
-    // public static JsonObject jsonObjectOfMap(Map<?, ?> map) throws IllegalAccessException {
-    //     final JsonObject jsonObject = new JsonObject();
-
-    //     for (Field field : object.getClass().getFields()) {
-
-    //         if (!field.isAnnotationPresent(TraceField.class))
-    //             continue;
-
-    //         final TraceField traceField = field.getAnnotation(TraceField.class);
-
-    //         try {
-    //             field.setAccessible(true);
-    //             final String fieldName = traceField.name() != null && !traceField.name().equals("") ? traceField.name() : field.getName();
-    //             final Object fieldValue = field.get(object);
-    //             jsonObject.add(fieldName, serializeValue(fieldValue));
-
-    //         } catch (Exception e) {
-    //             // Nothing
-    //             e.printStackTrace();
-    //         }
-    //     }
-
-    //     return jsonObject;
-    // }
 
     static JsonObject jsonObjectOfMap(Map<?, ?> map) throws IllegalAccessException {
         final JsonObject jsonObject = new JsonObject();
