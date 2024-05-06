@@ -8,17 +8,23 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * A server clock that can be shared through multiple processes. 
+ * A server clock that can be shared through multiple processes.
  */
 public class ServerClock {
     private ServerSocket serverSocket;
     private long clockValue;
 
     public synchronized long getNextTime(long clock) {
-        clockValue = Math.max(clockValue, clock) + 1;
-        return clockValue;
+        this.clockValue = Math.max(this.clockValue, clock) + 1;
+        return this.clockValue;
     }
 
+    /**
+     * Starts the server clock on the given port.
+     * 
+     * @param port the port to listen on
+     * @throws IOException if the server can't listen on the port
+     */
     public void start(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         while (true) {
@@ -26,10 +32,20 @@ public class ServerClock {
         }
     }
 
+    /**
+     * Stops the server clock.
+     * 
+     * @throws IOException if the server can't be stopped
+     */
     public void stop() throws IOException {
         serverSocket.close();
     }
 
+    /**
+     * A request handler for the server clock. It listens for incoming messages
+     * on the socket representing a clock value and sends back the next time value.
+     * It sends back -1 if the received value is invalid.
+     */
     private class RequestHandler extends Thread {
         private Socket clientSocket;
         private PrintWriter out;
@@ -67,10 +83,11 @@ public class ServerClock {
     }
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 1) return;
+        if (args.length < 1)
+            return;
         int port = Integer.parseInt(args[0]);
 
         ServerClock server = new ServerClock();
         server.start(port);
     }
-} 
+}
