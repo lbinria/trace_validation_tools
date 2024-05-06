@@ -14,24 +14,22 @@ public class ClientClock implements InstrumentationClock {
 
     /**
      * Get a new instance of the client clock.
+     * 
      * @param ip   address of the server
      * @param port port of the server
      * @return a new instance of the client clock (null if an error occurred)
+     * @throws IOException 
      */
-    public static ClientClock getInstance(String ip, int port) {
+    public static ClientClock getInstance(String ip, int port) throws IOException {
         ClientClock clientClock = new ClientClock();
-        try {
-            clientClock.startConnection(ip, port);
-        } catch (IOException e) {
-            System.out.println("Error while starting connection: " + e.getMessage());
-        }
-        return clientClock;  
+        clientClock.startConnection(ip, port);
+        return clientClock;
     }
 
     @Override
     public long getNextTime(long clock) {
         // request the next time from the server w.r.t. the current clock
-        out.println(clock+"");
+        out.println(clock + "");
         long newValue = -1;
         try {
             newValue = Long.parseLong(in.readLine());
@@ -41,7 +39,7 @@ public class ClientClock implements InstrumentationClock {
         return newValue;
     }
 
-    private void startConnection(String ip, int port) throws UnknownHostException, IOException {
+    private void startConnection(String ip, int port) throws IOException {
         clientSocket = new Socket(ip, port);
         out = new PrintWriter(clientSocket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));

@@ -18,13 +18,17 @@ public class ClockFactory {
                 String cn = name.length == 1 ? name[0] : "default";
                 try {
                     return new FileClock(cn);
-                } catch (IOException exc) {
-                    throw new ClockException("Can't create clock: " + exc.getMessage());
+                } catch (IOException e) {
+                    throw new ClockException("Can't create clock: " + e.getMessage());
                 }
             case SERVER:
                 String ip = name.length >= 1 ? name[0] : "localhost";
                 int port = name.length == 2 ? Integer.parseInt(name[1]) : 6666;
-                return ClientClock.getInstance(ip, port);
+                try {
+                    return ClientClock.getInstance(ip, port);
+                } catch (IOException e) {
+                    throw new ClockException("Can't create clock: " + e.getMessage());
+                }
             default:
                 return new MemoryClock();
         }
