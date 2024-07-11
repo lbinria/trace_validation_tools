@@ -28,6 +28,10 @@ RemoveElementFromBag(cur, val) ==
         [cur EXCEPT ![val] = cur[val] - 1]
     ELSE
         cur
+
+AddToBag(cur, val) == cur (+) SetToBag({val})
+RemoveFromBag(cur, val) == cur (-) SetToBag({val})
+
 ClearBag(cur, val) == <<>>
 
 AppendElement(cur, val) == Append(cur, val)
@@ -51,6 +55,8 @@ Apply(op, var, default, args) ==
     []   op = "Clear" -> Clear(var, {})
     []   op = "AddElementToBag" -> AddElementToBag(var, args[1])
     []   op = "RemoveElementFromBag" -> RemoveElementFromBag(var, args[1])
+    []   op = "AddToBag" -> AddToBag(var, args[1])
+    []   op = "RemoveFromBag" -> RemoveFromBag(var, args[1])
     []   op = "ClearBag" -> Clear(var, <<>>)
     []   op = "AppendElement" -> AppendElement(var, args[1])
     []   op = "ResetKey" -> ResetKey(var, args[1])

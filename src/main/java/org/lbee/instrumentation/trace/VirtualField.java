@@ -183,6 +183,22 @@ public final class VirtualField {
     }
 
     /**
+     * Notifies the tracer that an object is added to a bag.
+     * @param val the object to add
+     */
+    public void addValToBag(Object val) {
+        apply("AddToBag", val);
+    }
+
+    /**
+     * Notifies the tracer that an object is removed from a bag.
+     * @param val the object to remove
+     */
+    public void removeValFromBag(Object val) {
+        apply("RemoveFromBag", val);
+    }
+
+    /**
      * Notifies the tracer that the bag is cleared.
      */
     public void clearBag() {
